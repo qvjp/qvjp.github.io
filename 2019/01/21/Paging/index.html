@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="3LBkmq9FRQKDOtztA1tWy4VCZ2uab3fSas9iWWyVioU">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="dF4qk7hXCH">
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":true},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="从最开始的HELLO WORLD，到上一篇开启中断，我们一直没有怎么讨论系统镜像的布局及虚拟内存，这篇就着重研究一下OS中这两方面的知识与实现。">
+<meta name="keywords" content="Memory,Virtual Memory">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开启分页">
+<meta property="og:url" content="https://blog.inlow.online/2019/01/21/Paging/index.html">
+<meta property="og:site_name" content="INLOW开发博客">
+<meta property="og:description" content="从最开始的HELLO WORLD，到上一篇开启中断，我们一直没有怎么讨论系统镜像的布局及虚拟内存，这篇就着重研究一下OS中这两方面的知识与实现。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://inlow.xiaojumao.club/paging.png">
+<meta property="og:updated_time" content="2020-05-27T15:22:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="开启分页">
+<meta name="twitter:description" content="从最开始的HELLO WORLD，到上一篇开启中断，我们一直没有怎么讨论系统镜像的布局及虚拟内存，这篇就着重研究一下OS中这两方面的知识与实现。">
+<meta name="twitter:image" content="https://inlow.xiaojumao.club/paging.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://blog.inlow.online/2019/01/21/Paging/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>开启分页 | INLOW开发博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">INLOW开发博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+  
+  
+
+  
+
+  <a href="https://github.com/qvjp/INLOW" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" style="fill: #222; color: #fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.inlow.online/2019/01/21/Paging/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Qv Junping">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://inlow.xiaojumao.club/INLOW-icon.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="INLOW开发博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">开启分页
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-21 21:10:25" itemprop="dateCreated datePublished" datetime="2019-01-21T21:10:25+08:00">2019-01-21</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-05-27 23:22:16" itemprop="dateModified" datetime="2020-05-27T23:22:16+08:00">2020-05-27</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/INLOW/" itemprop="url" rel="index"><span itemprop="name">INLOW</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/INLOW/Develop/" itemprop="url" rel="index"><span itemprop="name">Develop</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/01/21/Paging/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/01/21/Paging/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">9.5k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">24 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>从最开始的HELLO WORLD，到上一篇开启中断，我们一直没有怎么讨论系统镜像的布局及虚拟内存，这篇就着重研究一下OS中这两方面的知识与实现。<br><a id="more"></a><br>INLOW由GRUB引导，内核被GRUB加载到物理内存0x00100000（1M），另外当GRUB把控制权交给内核时，分页是关闭的，也就是物理地址和虚拟地址是相同的。但虚拟内存是必须要开启的，不论是出于性能、安全、方便的考虑。</p>
+<h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><p>对内存（RAM）的访问发生在每时每刻，比如每条指令都要从内存中取出才能被CPU执行。虚拟内存改变了我们访问内存的方式，地址和地址变得不一样了，让应用开发变得简单，并且可以让程序利用大于物理内存的内存空间，所以虚拟内存这里是我们要好好理解的部分。<br>在x86中，虚拟内存可以通过分页和分段来实现，但分页更通用且优点更多，所以下边虚拟内存全部是通过分页实现的。<br>首先先来说下在打开虚拟内存之前我们是如何访问内存的：CPU发出读写某个地址的请求，请求通过芯片组，多数情况下芯片组会去请求内存，或者去请求I/O端口。如下图：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">+----CPU---+  0x01 +--芯片组---+  0x01 +---------RAM---------+</span><br><span class="line">|          |------&gt;|          |------&gt;|   0xA    |   0xB    |</span><br><span class="line">|          |&lt;------|          |&lt;------+----------+----------+</span><br><span class="line">+----------+  0xA  +----------+  0xA   0x1       0x2</span><br></pre></td></tr></table></figure></p>
+<p>当打开虚拟内存，内核会先去设置一块叫做页表的数据结构，这是一个包含虚拟地址到物理地址映射的表，可能会有多级页表。当虚拟内存开启后，访问内存变成了：CPU发出读写某个地址的请求，内存管理单元（MMU）捕获请求，通过页表（保存在内存中）把虚拟地址转换成物理地址，然后交给芯片组去访问物理内存。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">+----CPU---+  0x01 +----MMU---+  0xC1 +--芯片组---+ 0xC1  +--------------------RAM--------------------+</span><br><span class="line">|          |------&gt;|          |------&gt;|          |------&gt;|   0xA               |   0xF    |   0xD    |</span><br><span class="line">|          |&lt;------|          |&lt;------|          |&lt;------+---------------------+----------+----------+</span><br><span class="line">+----------+  0xF  +----------+  0xF  +----------+  0xF   0x1                  0xC1       0xC2</span><br></pre></td></tr></table></figure></p>
+<p>这里可能会有点疑惑，CPU访问内存每次都会经过MMU处理，那去页表查询物理地址的过程不就会产生死循环么？不会，因为访问页表是直接通过物理地址去访问。<br>INLOW采用二级页表，下边都是以二级页表进行说明。</p>
+<h3 id="MMU"><a href="#MMU" class="headerlink" title="MMU"></a>MMU</h3><p>分页是通过MMU（Memory Management Unit）实现的，在x86中，MMU通过两类表来映射内存，分别是页目录（Paging Directory）和页表（Paging Table）。<br>每个表包含1024个4字节的项，也就是每个表的大小是4K。页目录中每个表项指向一个页表，页表中每项指向一个物理地址，这样可以访问整个4G的内存空间。</p>
+<h3 id="页目录"><a href="#页目录" class="headerlink" title="页目录"></a>页目录</h3><p>分页系统中顶层分页结构是页目录（PD），它是页目录项的数组，先来看一下它的结构：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">+-----------------------------------------+-----+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|     Page table 4K aligned address       |Avail|G|S|0|A|D|W|U|R|P|</span><br><span class="line">+-----------------------------------------+-----+-+-+-+-+-+-+-+-+-+</span><br><span class="line">31                                        11    9                 0</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>P（Present），如果这一位是1，那么这一页现在在物理内存中。例如，当一个页面被换出到磁盘，物理内存中没有这个页，所以P位也就是0，如果这个页被使用，但P位不存在，将产生缺页错误，然后交由OS处理。</li>
+<li>R（Read/Write），读写权限位，如果此位被设置，那么是可读可写的，否则此页只读。</li>
+<li>U（User/Supervisor），此页的权限级，如果这一位被设置，那么这个页面可以被任何权限级访问，如果没设置，只有更高权限级可以访问。对于页目录项来说，它的权限级会影响所有它引用的页面，因此如果你想设置某个页为用户页，就必须设置相关的页目录项和页表项都是用户级权限。</li>
+<li>W（Write-Through），如果这一位没被设置，wirte-through将开启，否则write-back开启。<blockquote>
+<p>当CPU采用高速缓存时，它的写内存操作有两种模式：<br>一种称为“穿透”(Write-Through)模式，在这种模式中高速缓存对于写操作就好像不存在一样，每次写时都直接写到内存中，所以实际上只是对读操作使用高速缓存，因而效率相对较低。<br>另一种称为“回写”(Write-Back)模式，写的时候先写入高速缓存，然后由高速缓存的硬件在周转使用缓冲线时自动写入内存，或者由软件主动地“冲刷”有关的缓冲线。</p>
+</blockquote>
+</li>
+<li>D（Cache Disable），如果被设置，将禁用缓存，反之亦反。</li>
+<li>A（Accessed），此位用来标记页面是否被读/写，如果读/写过，那么设置1。这一位不会被CPU清空，所以OS要自己操作这里。</li>
+<li>S（Page Size），保存页面大小，如果这一位被设置，那么页大小为4M，否则为4K。要注意4M的页需要开启PSE。如果S被设置了，那么页目录项会直接指向一个4M的页，不再需要页表。<strong>注意</strong>：4M的页中，12到21位被保留，因此只能4M对齐。</li>
+<li>G 忽略。</li>
+<li>Avail，处理器不使用这3位，OS可以保存自己需要的信息。</li>
+<li>剩下的20位用来保存页表的物理地址，可以表示一个4M（2<sup>20</sup> * 4K)的地址空间。要注意的是这个地址必须4K对齐，因为0-11位被用作上边的其他用处。</li>
+</ul>
+<p>另外，如果P位不设置，CPU会忽略掉此项剩下的部分，所以你可以用剩下的31位保存额外信息，比如记录在交换空间中页在哪里结束。<br>页目录每项4字节，4K的页目录中有1024项，每个页目录项指向一个页表，每个页表也是4K，也就是页表一共占用1024 * 4K = 4M空间。所以页目录和页表一共要占用4k+4M的空间。</p>
+<h3 id="页表"><a href="#页表" class="headerlink" title="页表"></a>页表</h3><p>每个页表中也有1024个项，被称为页表项，它的结构和页目录基本一致：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">+-----------------------------------------+-----+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|          Physical Page Address          |Avail|G|0|D|A|C|W|U|R|P|</span><br><span class="line">+-----------------------------------------+-----+-+-+-+-+-+-+-+-+-+</span><br><span class="line">31                                        11    9                 0</span><br></pre></td></tr></table></figure></p>
+<p>与页目录相同的字段不再说明，以下是页表独有的信息：</p>
+<ul>
+<li>C（Cached），和页目录中“D”位一样。</li>
+<li>D（Dirty），如果设置了此位，表明此页面已经被写入。此位不会被CPU更新，要OS手动更新。</li>
+<li>G（Global），如果页是全局的，那么它将在高速缓存中一直保存。当CR4.PGE=1时，可以设置此位为1，指示Page是全局Page，在CR3被更新时，TLB内的全局Page不会被刷新。</li>
+</ul>
+<p>页目录占用4K空间，一共1024项，最多指向1024个页表，每个页表指向一个4K的物理内存，所以一共可以访问的内存是1024 * 1024 * 4K = 4G。</p>
+<h3 id="开启分页"><a href="#开启分页" class="headerlink" title="开启分页"></a>开启分页</h3><p>首先要准备页目录和页表，要让页目录找得到页表：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">movl $(bootstrapPageTable + <span class="number">0x3</span>), pageDirectory</span><br><span class="line">movl $(kernelPageTable + <span class="number">0x3</span>), pageDirectory + <span class="number">0xC00</span></span><br></pre></td></tr></table></figure></p>
+<p>上边的+0x3（二进制11）是为了设置页表的低2位为11，使其可读写可用。</p>
+<p>准备好了页目录和页表后，就可以将页目录的地址加载到CR3寄存器（控制寄存器3）中。CR3寄存器低12位为相关的控制属性位，高20位为页目录基地址。所以页目录不能随意存放在内存中的任意位置，必须4K对齐，即地址的低12位为全部为0。然后还要设置CR0的分页位（PG）和保护位（PE）为1，这将告诉CPU接下来通过MMU来转换地址，这样就开启了分页。可以简单的通过下边的代码来开启分页：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 开启分页 */</span></span><br><span class="line">mov $pageDirectory, %ecx <span class="comment">/* 保存顶级页表（页目录）地址 */</span></span><br><span class="line">mov %ecx, %cr3           <span class="comment">/* 告诉CPU页目录地址 */</span></span><br><span class="line">mov %cr0, %ecx           <span class="comment">/* 保存cr0原来的值到%ecx */</span></span><br><span class="line"><span class="keyword">or</span> $<span class="number">0x80000001</span>, %ecx     <span class="comment">/* 开启分页和保护 */</span></span><br><span class="line">mov %ecx, %cr0           <span class="comment">/* 更新cr0 ，分页开启*/</span></span><br></pre></td></tr></table></figure></p>
+<p>在执行完上述的几条指令后，CPU会和平常一样自增程序计数器（PC），然后从这个位置去取下一条指令。但是现在这个地址已经被MMU翻译了，已经不是原来的地址了，我们增加的是物理地址，但是会被认为是虚拟地址来处理，肯定会出错。怎们办呢？伟大的前辈OS设计者想出了一个办法，我们可以在开启页表前在页表中增加一些项，最简单的就是直接映射（Identity Map）包含内核的空间，因为INLOW内核开始于0x0010000，所以页表应该将0x00100000映射到0x00100000。这样，CPU获取下一条指令时就不会被MMU改变为错误的地址。<br>这个映射的代码如下：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">    <span class="comment">/* identity mapping bootstrap section */</span></span><br><span class="line">    mov $numBootstrapPages, %ecx</span><br><span class="line">    <span class="comment">/* 最低的1M空间被BISO和GRUB使用，为了使映射更加明了，直接映射没有映射最开始1M */</span></span><br><span class="line">    mov $(bootstrapPageTable + <span class="number">256</span> * <span class="number">4</span>), %edi</span><br><span class="line">    mov $(bootstrapBegin + <span class="number">0x3</span>), %edx</span><br><span class="line"></span><br><span class="line"><span class="number">1</span>:</span><br><span class="line">    mov %edx, (%edi)</span><br><span class="line">    <span class="comment">/* bootstrapPageTable中每项大小为4 bytes */</span></span><br><span class="line">    add $<span class="number">4</span>, %edi</span><br><span class="line">    <span class="comment">/* 页大小为4096 bytes */</span></span><br><span class="line">    add $<span class="number">4096</span>, %edx</span><br><span class="line">    <span class="comment">/* 循环直到最后一个页表项 */</span></span><br><span class="line">    loop <span class="number">1b</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="虚拟地址到物理地址"><a href="#虚拟地址到物理地址" class="headerlink" title="虚拟地址到物理地址"></a>虚拟地址到物理地址</h3><p>有了上边的知识，我们可以轻易的画出下图：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">|31               22|21               12|11                    0|</span><br><span class="line">-----------------------------------------------------------------</span><br><span class="line">|   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |</span><br><span class="line">--------------------|-------------------|------------------------</span><br><span class="line">\________  ________/ \________  _______/ \__________  __________/</span><br><span class="line">         \/                   \/                    \/</span><br><span class="line">          |                    |                     |</span><br><span class="line">          / 10                 / 10                  / 12</span><br><span class="line">          |                    |                     |  page frame</span><br><span class="line">          | page directory     |                     |  ----------</span><br><span class="line">          |   ----------       |   page table        |  |        |</span><br><span class="line">          |   |    .   |       |   ----------        |  |    .   |</span><br><span class="line">          |   |    .   |       |   |    .   |        |  |    .   |</span><br><span class="line">          |   |    .   |       |   |    .   |        |  |    .   |</span><br><span class="line">          |   |--------|       |   |    .   |        |  |        |</span><br><span class="line">          |   |PD entry|__     |   |--------|        |  |--------|</span><br><span class="line">          --&gt; |--------|  |    |   |PT entry|--      |  |phy addr|</span><br><span class="line">              |    .   |  |    --&gt; |--------|  |     -&gt; |--------|</span><br><span class="line">              |    .   |  / 20     |    .   |  |        |        |</span><br><span class="line">              |    .   |  |        |    .   |  |        |    .   |</span><br><span class="line">        ----&gt; ----------  |        |    .   |  / 20     |    .   |</span><br><span class="line">        / 20              -------&gt; ----------  |        |    .   |</span><br><span class="line">        |     |--------|                       |        |        |</span><br><span class="line">        ------|  CR3   |                       |        |        |</span><br><span class="line">              |--------|                       -------&gt; ----------</span><br></pre></td></tr></table></figure>
+<p>比如要访问内存0x0010 0000，开启分页前是直接访问物理内存0x0010 0000，现在开启了分页，0x0010 0000的二进制形式是0000 0000 0001 0000 0000 0000 0000 0000，按照上图，高10位是0000 0000 00，也就是页目录中第0项，页目录第0项指向第0个页表，INLOW中是0x0010 20000，然后中间10位是01 0000 0000，也就是十进制256，指向页表的第256个项，正是<code>mov $(bootstrapPageTable + 256 * 4), %edi</code>中最开始时<code>%edi</code>保存的位置，也就是是0x0010 2400，通过上边的映射，我们知道这个页表项正好指向bootstrapBegin，也就是0x0010 0000，低12位全是0，偏移量是0，最终翻译后的物理地址还是0x0x0010 0000，identity mapping成功。</p>
+<h2 id="Higher-Half-Kernel"><a href="#Higher-Half-Kernel" class="headerlink" title="Higher Half Kernel"></a>Higher Half Kernel</h2><p>开启虚拟内存的一个主要原因可能就是让每一个用户程序都像是被加载到了0地址，然而操作系统现在在低地址，所以我们想让OS好像存在于“高一半地址”，比如经典的0xC0000000（3G）。这样前3G作为用户程序的地址空间，最后1G作为内核空间。这个设计就叫做“Higher Half Kernel”。</p>
+<h3 id="为什么要使用这种设计"><a href="#为什么要使用这种设计" class="headerlink" title="为什么要使用这种设计"></a>为什么要使用这种设计</h3><p>上边我们把虚拟地址0x00100000映射到了物理地址0x00100000，好像可以正常工作了，先不说这样和没开启分页没有什么区别，就是访问内存要先经过页目录、页表我们也很容易发现这样效率肯定会变低，更别说将来加上用户态程序（通常链接器会假定代码被加载到0x00000000），冲突也解决不了。因此，我们的内核务必放到虚拟内存的其他地方。</p>
+<h3 id="将内核变到高地址"><a href="#将内核变到高地址" class="headerlink" title="将内核变到高地址"></a>将内核变到高地址</h3><p>之前的内核，我们在开启分页前只是设置了包含内核部分的直接映射，要把内核跳到高地址空间，还需要在开启分页前多做些工作。主要是要在linker脚本中重新确定不同部分的位置（relocation address），然后再将页目录、页表设置正确。<br>其中linker脚本中有如下片段：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">KERNEL_VIRTUAL = <span class="number">0xC0000000</span>;</span><br><span class="line">. += KERNEL_VIRTUAL;</span><br></pre></td></tr></table></figure></p>
+<p>有了上边的代码，内核将被加载到内存的0xC0000000处，没问题，但假如我们的电脑内存不够4G怎么办？我们只好将内核加载到低地址空间，因为GRUB引导的内核前1M空间被保留，所以我们把内核放到从1M开始的位置。然后linker脚本中需要再指明每个sectoin到底要放哪里。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">.<span class="function">text <span class="title">ALIGN</span><span class="params">(<span class="number">4</span>K)</span> : <span class="title">AT</span><span class="params">(ADDR(.text) - KERNEL_VIRTUAL)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.<span class="function">rodata <span class="title">ALIGN</span><span class="params">(<span class="number">4</span>K)</span> : <span class="title">AT</span><span class="params">(ADDR(.rodata) - KERNEL_VIRTUAL)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.<span class="function">data <span class="title">ALIGN</span><span class="params">(<span class="number">4</span>K)</span> : <span class="title">AT</span><span class="params">(ADDR(.data) - KERNEL_VIRTUAL)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>这段代码将会假定我们的代码被加载到0xC000 0000（relocation address），但实际上被加载到0x0010 0000（relocation address减去0xC000 0000）。<br>如何解决上边的混乱？这就需要再开启分页前映射两个地址。上边我们已经将最开始的2-4M内存进行了从虚拟地址到物理地址的映射，还想吧从0xC000 0000开始的虚拟内存映射到最开始的物理内存，如下图：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">              Virtual Memory                         Physical Memory</span><br><span class="line">            +-----------------+                    +-----------------+</span><br><span class="line">            |       ...       |                    |       ...       |</span><br><span class="line">0xC010 0000 +-----------------+ --------------     +-----------------+</span><br><span class="line">            |       ...       |                \   |       ...       |</span><br><span class="line">            +-----------------+                 \  +-----------------+</span><br><span class="line">            |       ...       |                  \ |       ...       |</span><br><span class="line">0x0010 0000 +-----------------+ ------&gt;0x0010 0000 +-----------------+</span><br></pre></td></tr></table></figure></p>
+<p>在设置第一个映射之后，马上设置第二个映射，然后开启分页。如下边代码：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">    <span class="comment">/* 映射高地址内核，代码和identity mapping没什么区别 */</span></span><br><span class="line">    mov $numKernelPages, %ecx</span><br><span class="line">    add $(kernelPageTable - bootstrapPageTable), %edi</span><br><span class="line">    mov $(kernelPhysicalBegin + <span class="number">0x3</span>), %edx</span><br><span class="line"></span><br><span class="line"><span class="number">1</span>:</span><br><span class="line">    mov %edx, (%edi)</span><br><span class="line">    <span class="comment">/* kernelPageTable中每项大小为4 bytes */</span></span><br><span class="line">    add $<span class="number">4</span>, %edi</span><br><span class="line">    <span class="comment">/* 页大小为4096 bytes */</span></span><br><span class="line">    add $<span class="number">4096</span>, %edx</span><br><span class="line">    <span class="comment">/* 循环直到最后一个页表项 */</span></span><br><span class="line">    loop <span class="number">1b</span></span><br></pre></td></tr></table></figure></p>
+<p>当然，不能忘记映射视频内存，因为最开始的1M我们前边没有处理。这里我把0xB8000映射到了0xC0000000。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/* 映射视频内存到0xC000 0000 */</span><br><span class="line">movl $0xB8003, kernelPageTable</span><br></pre></td></tr></table></figure></p>
+<p>改变了视频内存地址后，要把前边我们实现的printf函数进行稍许更改：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 0xC000 0000是视频虚拟内存首地址</span><br><span class="line">static uint8_t *video = (uint8_t*) 0xC0000000;</span><br></pre></td></tr></table></figure></p>
+<p>最后再上一张图吧<br><img src="https://inlow.xiaojumao.club/paging.png" alt="Paging Map"></p>
+<p>到现在为止，我们开启了GDT、中断、虚拟内存，实现了简单的printf函数。内核实际上被加载到了低地址（0x0010 0000）但就好像在高地址（0xC100 0000），这样后边实现用户态程序时就可以从虚拟地址0开始。</p>
+<p>一切都已就绪，终于可以跳到高虚拟地址去了！一切静好，下节继续内存管理，晚安。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://wiki.osdev.org/Paging" target="_blank" rel="noopener">Paging</a><br><a href="https://wiki.osdev.org/Page_Tables" target="_blank" rel="noopener">Page Tables</a><br><a href="https://wiki.osdev.org/Higher_Half_Kernel" target="_blank" rel="noopener">Higher Half Kernel</a><br><a href="https://wiki.osdev.org/Higher_Half_x86_Bare_Bones" target="_blank" rel="noopener">Higher Half x86 Bare Bones</a><br><a href="https://medium.com/@connorstack/how-does-an-os-enable-virtual-memory-696a8f75f274" target="_blank" rel="noopener">How does an OS enable virtual memory?</a><br><a href="https://medium.com/@connorstack/how-does-a-higher-half-kernel-work-107194e46a64" target="_blank" rel="noopener">How does a higher half kernel work?</a><br><a href="https://littleosbook.github.io" target="_blank" rel="noopener">The little book about OS development</a><br><a href="https://gist.github.com/CMCDragonkai/10ab53654b2aa6ce55c11cfc5b2432a4" target="_blank" rel="noopener">Understanding the Memory Layout of Linux Executables</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Memory/" rel="tag"># Memory</a>
+          
+            <a href="/tags/Virtual-Memory/" rel="tag"># Virtual Memory</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+            
+               <div id="needsharebutton-postbottom">
+                 <span class="btn">
+                    <i class="fa fa-share-alt" aria-hidden="true"></i>
+                 </span>
+               </div>
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/14/Interrupts/" rel="next" title="开启中断">
+                <i class="fa fa-chevron-left"></i> 开启中断
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/18/Debug-INLOW/" rel="prev" title="Debug INLOW">
+                Debug INLOW <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://inlow.xiaojumao.club/INLOW-icon.png" alt="Qv Junping">
+            
+              <p class="site-author-name" itemprop="name">Qv Junping</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/qvjp" title="GitHub &rarr; https://github.com/qvjp" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:qvjunping@gmail.com" title="E-Mail &rarr; mailto:qvjunping@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://www.zhihu.com/people/trouble_Q" title="Zhihu &rarr; https://www.zhihu.com/people/trouble_Q" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.csdn.net/lxfHaHaHa" title="https://blog.csdn.net/lxfHaHaHa" rel="noopener" target="_blank">李秀峰的Java博客</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.normalhamal.online/" title="https://blog.normalhamal.online/" rel="noopener" target="_blank">normalHamal的前端博客</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟内存"><span class="nav-number">1.</span> <span class="nav-text">虚拟内存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MMU"><span class="nav-number">1.1.</span> <span class="nav-text">MMU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#页目录"><span class="nav-number">1.2.</span> <span class="nav-text">页目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#页表"><span class="nav-number">1.3.</span> <span class="nav-text">页表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开启分页"><span class="nav-number">1.4.</span> <span class="nav-text">开启分页</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#虚拟地址到物理地址"><span class="nav-number">1.5.</span> <span class="nav-text">虚拟地址到物理地址</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Higher-Half-Kernel"><span class="nav-number">2.</span> <span class="nav-text">Higher Half Kernel</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么要使用这种设计"><span class="nav-number">2.1.</span> <span class="nav-text">为什么要使用这种设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将内核变到高地址"><span class="nav-number">2.2.</span> <span class="nav-text">将内核变到高地址</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Qv Junping</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数">95k</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长">3:58</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.7.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=6.7.0"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=6.7.0"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  <script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  <script>
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item) > -1;
+    });
+    new Valine({
+      el: '#comments' ,
+      verify: false,
+      notify: false,
+      appId: 'Ag0DRe0DuE0IcF5iX5QymBJi-gzGzoHsz',
+      appKey: '4vwW6ea2r2gO8iNHal50FI60',
+      placeholder: 'Just go go',
+      avatar: 'robohash',
+      meta:guest,
+      pageSize: '10' || 10,
+      visitor: false
+    });
+  </script>
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+  <script>
+    
+      pbOptions = {};
+      
+        pbOptions.iconStyle = "box";
+      
+        pbOptions.boxForm = "horizontal";
+      
+        pbOptions.position = "bottomCenter";
+      
+        pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function (i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap');
+      $(e).after($wrap);
+      $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function (e) {
+        var code = $(this).parent().find('.code').find('.line').map(function (i, e) {
+          return $(e).text();
+        }).toArray().join('\n');
+        var ta = document.createElement('textarea');
+        var range = document.createRange(); //For Chrome
+        var sel = window.getSelection(); //For Chrome
+        var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+        ta.style.top = yPosition + 'px'; //Prevent page scroll
+        ta.style.position = 'absolute';
+        ta.style.opacity = '0';
+        ta.value = code;
+        ta.textContent = code; //For FireFox
+        ta.contentEditable = true;
+        ta.readOnly = false;
+        document.body.appendChild(ta);
+        range.selectNode(ta);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        ta.setSelectionRange(0, code.length);
+        var result = document.execCommand('copy');
+        
+        ta.blur(); //For iOS
+        $(this).blur();
+      })).on('mouseleave', function (e) {
+        var $b = $(this).find('.copy-btn');
+        setTimeout(function () {
+          $b.text('复制');
+        }, 300);
+      }).append(e);
+    })
+  </script>
+
+
+  
+
+</body>
+</html>

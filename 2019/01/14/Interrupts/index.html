@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="3LBkmq9FRQKDOtztA1tWy4VCZ2uab3fSas9iWWyVioU">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="dF4qk7hXCH">
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":true},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="有了上篇的GDT，我们可以着手设置中断了，终于到了有意思的地方，加油。">
+<meta name="keywords" content="IDT">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开启中断">
+<meta property="og:url" content="https://blog.inlow.online/2019/01/14/Interrupts/index.html">
+<meta property="og:site_name" content="INLOW开发博客">
+<meta property="og:description" content="有了上篇的GDT，我们可以着手设置中断了，终于到了有意思的地方，加油。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://inlow.xiaojumao.club/Interrupts.png">
+<meta property="og:updated_time" content="2020-05-27T15:22:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="开启中断">
+<meta name="twitter:description" content="有了上篇的GDT，我们可以着手设置中断了，终于到了有意思的地方，加油。">
+<meta name="twitter:image" content="https://inlow.xiaojumao.club/Interrupts.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://blog.inlow.online/2019/01/14/Interrupts/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>开启中断 | INLOW开发博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">INLOW开发博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+  
+  
+
+  
+
+  <a href="https://github.com/qvjp/INLOW" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" style="fill: #222; color: #fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.inlow.online/2019/01/14/Interrupts/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Qv Junping">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://inlow.xiaojumao.club/INLOW-icon.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="INLOW开发博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">开启中断
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-14 08:57:26" itemprop="dateCreated datePublished" datetime="2019-01-14T08:57:26+08:00">2019-01-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-05-27 23:22:16" itemprop="dateModified" datetime="2020-05-27T23:22:16+08:00">2020-05-27</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/INLOW/" itemprop="url" rel="index"><span itemprop="name">INLOW</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/INLOW/Develop/" itemprop="url" rel="index"><span itemprop="name">Develop</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/01/14/Interrupts/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/01/14/Interrupts/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">9.9k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">25 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>有了上篇的GDT，我们可以着手设置中断了，终于到了有意思的地方，加油。<br><a id="more"></a></p>
+<h3 id="中断概览"><a href="#中断概览" class="headerlink" title="中断概览"></a>中断概览</h3><p>一般来说，CPU时时刻刻都在运行着某个任务，当有特别的事件发生时，CPU会暂时停下当前的工作，转向执行处理该事件的程序，事件处理完毕后，转回原来的地方继续执行，这样的处理模式称为中断（Interrupt）控制模式。也就是一个某设备发送给CPU一个信号（也可能是CPU内部产生），然后CPU去IDT（Interrupt Descriptor Table）中找到对应于这个信号的程序去执行，在x86中IDT共保存了256个中断向量。比如我们按下键盘上一个按键，键盘控制器将会发送给CPU一个信号，然后CPU根据IDT中的程序作出响应。这个理解是正确的，但是这里我们要写代码，要把细节落实下去，其实通常中断分为下边三种（Intel开发人员手册第六章中可能会有不同的分法，暂且不管）：</p>
+<h4 id="异常（Exceptions）"><a href="#异常（Exceptions）" class="headerlink" title="异常（Exceptions）"></a>异常（Exceptions）</h4><p>异常是由CPU内部生成，用来在内核运行时发出警告，比如有除以0异常或是断点异常等。其中异常分为三类</p>
+<ul>
+<li>错误（Faults）：不严重的错误，可以被纠正，程序可能会继续执行。</li>
+<li>陷阱（Traps）：在执行陷阱指令后立即报告。陷阱允许程序或任务继续执行而不丢失程序连续性。</li>
+<li>终止（Aborts）：严重的不可恢复的错误。</li>
+</ul>
+<p>在异常中，有些在发生时会向栈顶压入一个32位的错误码，提供错误的额外信息。</p>
+<h4 id="中断请求（IRQs）"><a href="#中断请求（IRQs）" class="headerlink" title="中断请求（IRQs）"></a>中断请求（IRQs）</h4><p>Interrupt ReQuest，IRQs又叫硬中断，信号来自芯片组的外部。比如一些设备当数据准备好等待去读取时可能会发送一个IRQ，另一些设备则可能是完成某个命令，比如向磁盘写入一个buffer后也会发送一个IRQ。总之就是一个设备想让CPU注意，就会产生一个IRQ。而这些设备是包含从网卡到鼠标到串口的一切设备。</p>
+<h4 id="软中断（Software-Interrupt）"><a href="#软中断（Software-Interrupt）" class="headerlink" title="软中断（Software Interrupt）"></a>软中断（Software Interrupt）</h4><p>这个一般来说就是系统调用，顾名思义就是用软件设置的中断。是某个软件要进行某个操作而需要引起CPU的注意。在x86中，使用<code>INT</code>来开启软中断，我们可以使用256个中断向量中的任意一个来作为软中断，INLOW和其他类UNIX一样，使用0x80。</p>
+<h3 id="中断流程"><a href="#中断流程" class="headerlink" title="中断流程"></a>中断流程</h3><hr>
+<p>下边我们先上个示意图，然后根据示意图的流程来一步步理清楚中断到底是怎么回事。<br><img src="https://inlow.xiaojumao.club/Interrupts.png" alt="Interrupt"><br>可以看到，处理一次中断，期间涉及到的设备或概念有：</p>
+<ul>
+<li>中断源：发出中断请求的设备。</li>
+<li>PIC：Programmable Interrupt Controller，由两块8259芯片组成，分别称为主PIC和从PIC，如图从PIC的INTR管脚连接到主PIC的IR2管脚，这样我们就可以连接16 - 1 = 15个中断源。</li>
+<li>CPU：CPU接收到来自PIC的信号后，便去找对应的处理程序。</li>
+<li>IDT：Interrupt Descriptor Table，IDT为CPU找到对应的处理程序提供了可能，IDT可以放在内存的任意位置，存储了0~255个中断和它们的服务历程关系的信息，当然还包括一些权限检查等信息，具体内容后边再说。</li>
+<li>GDT：<a href="https://blog.inlow.online/2019/01/10/GDT/">GDT</a>的概念前边详细说过，这里不再介绍。有了IDT就可以直接找到对应的服务程序吗？还是不够，IDT中服务程序位置信息只保存了所在段和段内偏移，所以还要借助GDT去找到这个段的基地址，然后再根据偏移量找到具体的服务程序。</li>
+<li>ISR：Interrupt Service Routines，具体处理此中断。</li>
+</ul>
+<p>上边一直在说PIC，并没有提APIC，是因为INLOW是一个简单的实践，并没有实现APIC模式的中断处理，虽然我们现在用到的设备可能都是APIC，但Intel在1997年发布的MPS中要求APIC要向前兼容，也就是说我们完全可以把APIC当作PIC来编程，可能以后会支持APIC吧。</p>
+<h3 id="如何实现中断"><a href="#如何实现中断" class="headerlink" title="如何实现中断"></a>如何实现中断</h3><hr>
+<p>通过上边的叙述，我们好像对中断有了点印象，但如何编码？如何实现呢？按照下边的步骤：</p>
+<ul>
+<li>配置PIC</li>
+<li>设置并加载IDT</li>
+<li>实现ISR处理程序（这里仅先实现部分IRQs和Exceptions）</li>
+</ul>
+<h4 id="配置PIC"><a href="#配置PIC" class="headerlink" title="配置PIC"></a>配置PIC</h4><p>前边说过，PIC是由两块8259芯片组成，每块有8个输入管脚，一个输出管脚。从PIC的输出管脚连接主PIC的第3个输入管脚（IR2），主PIC的输出管脚连接CPU。所以当从PIC接收到中断信息要先告诉主PIC，主PIC在通知CPU，这种模式称为“层叠模式”（cascade）。因为主PIC的第三个输入管脚连接到了从PIC，所以IRQ2不能发生。<br>当设备发送给PIC芯片一个中断信号后，PIC直接或间接的告诉CPU中断发生，当CPU确认中断发生后，PIC发送中断号给CPU，中断号是从00H（0）~FFH（255）。但系统初始化时BIOS会将IRQ的0~7设为中断的08H（8）~0FH（15）号，IRQ的8~15设为中断的70H（112）~77H（119）号。而CPU保留了中断号0~31，那么假如CPU接收到INT 8时，到底是系统保留异常的Double Fault，还是IRQ0 Devide-by-zero呢？当然可以通过一些方法确定到底是哪个设备发出的请求，但这些方法不一定一直可用，最好的方法是配置一下PIC，使其不要映射到中断的0~15号。我们这里是将IRQ的0~7设为中断的20H（32）~27H（39）号，IRQ的8~15设为中断的28H（40）~2FH（47）号<br>如何重新映射IRQ到INT的关系呢？先上核心代码，再解释：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq_remap</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">/* 开始初始化序列 */</span></span><br><span class="line">    outportb(PIC1_COMMAND, <span class="number">0x11</span>);</span><br><span class="line">    outportb(PIC2_COMMAND, <span class="number">0x11</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 主PIC向量偏移0x20(也就是主PIC重新映射后是从INT的32-39)，从PIC向量偏移0x28(从PIC40-47) */</span></span><br><span class="line">    outportb(PIC1_DATA, <span class="number">0x20</span>);</span><br><span class="line">    outportb(PIC2_DATA, <span class="number">0x28</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 告诉主PIC在IRQ2(0000 0100)有从PIC</span></span><br><span class="line"><span class="comment">     * 告诉从PIC它的层叠号吗(0000 0010)</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    outportb(PIC1_DATA, <span class="number">0x04</span>);</span><br><span class="line">    outportb(PIC2_DATA, <span class="number">0x02</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * ICW4</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    outportb(PIC1_DATA, <span class="number">0x01</span>);</span><br><span class="line">    outportb(PIC2_DATA, <span class="number">0x01</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>每一个PIC芯片都有一个命令端口和一个数据端口，主PIC的命令端口在0x20，数据端口在0x21；从PIC的命令端口在0xA0，数据端口在0xA1。初始化PIC可能用到4个初始命令字（Initialization Command Word），按顺序向指定端口设置4个ICW就可以完成PIC的初始化工作，也就实现了从新映射的目的。下边看一下ICW的配置细节：</p>
+<ul>
+<li><p>ICW1 开始初始化PIC（向命令端口写入）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">|0|0|0|1|x|0|x|x|</span><br><span class="line">         |   | +--- with ICW4 (1) or without (0)</span><br><span class="line">         |   +----- one controller (1), or cascade (0)</span><br><span class="line">         +--------- triggering by level (level) (1) or by edge (edge) (0)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ICW2 设置向量偏移（向数据端口写入）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">|x|x|x|x|x|0|0|0|</span><br><span class="line"> | | | | |</span><br><span class="line"> +----------------- base address for interrupts vectors</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ICW3 主/从PIC如何连接（向数据端口写入）<br>主PIC：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">|x|x|x|x|x|x|x|x|</span><br><span class="line"> | | | | | | | |</span><br><span class="line"> +------------------ slave controller connected to the port yes (1), or no (0)</span><br></pre></td></tr></table></figure>
+<p>  从PIC：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">|0|0|0|0|0|x|x|x|  pour l&apos;esclave</span><br><span class="line">           | | |</span><br><span class="line">           +-------- Slave ID which is equal to the master port</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ICW4 额外信息（向数据端口写入）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">|0|0|0|x|x|x|x|1|</span><br><span class="line">       | | | +------ mode &quot;automatic end of interrupt&quot; AEOI (1)</span><br><span class="line">       | | +-------- mode buffered slave (0) or master (1)</span><br><span class="line">       | +---------- mode buffered (1)</span><br><span class="line">       +------------ mode &quot;fully nested&quot; (1)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>好了，到这里我想对PIC的设置大家都是比较清楚了，但向I/O端口和内存读写前边好像一直没提到，这里做个说明。<br>在x86平台上，有两组地址空间：I/O空间和内存空间，内存空间我们可能比较熟悉，使用高级语言编程时会涉及到内存的申请分配，不再赘述，而I/O空间是与内存彼此相互独立的空间，在x86上有65536个8位的I/O端口，外部硬件就是通过I/O端口进行控制的。比如上边的PIC就属此类。<br>那么如何读写I/O端口呢？汇编可以直接使用IN/OUT指令，C/C++中也可以使用内联汇编来操作，比如下边的向I/O端口写8位数据的实现：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">outportb</span><span class="params">(<span class="keyword">uint16_t</span> port, <span class="keyword">uint8_t</span> value)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    __asm__ __volatile__ (<span class="string">"outb %0, %1"</span></span><br><span class="line">                           :</span><br><span class="line">                           : <span class="string">"a"</span>(value), <span class="string">"Nd"</span>(port));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>发送8/16/32位的值到I/O地址，分别用outb/outw/outl。</p>
+<h4 id="设置IDT"><a href="#设置IDT" class="headerlink" title="设置IDT"></a>设置IDT</h4><p>IDT是x86架构保护模式特有的概念，它告诉CPU去哪找到ISR（Interrupt Service Routines）。</p>
+<h5 id="IDT结构"><a href="#IDT结构" class="headerlink" title="IDT结构"></a>IDT结构</h5><p>先来看IDT的结构，IDT和GDT的结构有些类似，其结构如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">                              * IDT ENTRT *</span><br><span class="line">|-------------------------------------------------------------------------|</span><br><span class="line">|                     |        |        |                |                |</span><br><span class="line">|     Offset          |  Attr  |  Zero  |    Selector    |     Offset     |</span><br><span class="line">|      16:31          |        | 16:23  |      0:15      |      0:15      |</span><br><span class="line">|                     |        |        |                |                |</span><br><span class="line">|-------------------------------------------------------------------------|</span><br><span class="line">|63                 48|47    40|39    32|31            16|15             0|</span><br></pre></td></tr></table></figure></p>
+<p>如图，IDT每个条目都是64位，其中：</p>
+<ul>
+<li>0-15和48-63共32位，用来存放ISR的入口地址</li>
+<li>16-31共16位，用来存放指向GDT某个段的段选择子</li>
+<li>32-39共8位，没有被使用，全部设为0</li>
+<li><p>40-47共8位，是类型和属性位，下边具体分析：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">            * Attr Byte *</span><br><span class="line">|-------------------------------------|</span><br><span class="line">|    |       |    |                   |</span><br><span class="line">| Pr |  DPL  | S  |       TYPE        |</span><br><span class="line">|    |       |    |                   |</span><br><span class="line">|-------------------------------------|</span><br><span class="line">|    7       5    4    3    2    1   0|</span><br></pre></td></tr></table></figure>
+<ul>
+<li>TYPE共四位，在32位模式中，TYPE可能的设置有<ul>
+<li>0101 表示IDT中此条是一个task gate</li>
+<li>1110 表示IDT中此条是一个interrupt gate</li>
+<li>1111 表示IDT中此条是一个trap gate</li>
+</ul>
+</li>
+<li>S（Storage Segment）设置为0</li>
+<li>DPL即Descriptor Privilege Level，指定调用此描述符所属最高特权级，不被用户空间直接使用，设置为0即可</li>
+<li>PR设置为0表示未使用</li>
+</ul>
+</li>
+</ul>
+<p>IDT结构了解了，我们可以直接在头文件中将其定义出来：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">idt_entry</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">uint16_t</span> offset_low;</span><br><span class="line">    <span class="keyword">uint16_t</span> selector;</span><br><span class="line">    <span class="keyword">uint8_t</span> unused;</span><br><span class="line">    <span class="keyword">uint8_t</span> attr;</span><br><span class="line">    <span class="keyword">uint16_t</span> offset_high;</span><br><span class="line">&#125; __attribute__((__packed__));</span><br></pre></td></tr></table></figure></p>
+<h5 id="IDTR结构"><a href="#IDTR结构" class="headerlink" title="IDTR结构"></a>IDTR结构</h5><p>我们使用汇编指令<code>LIDT</code>来加载IDT，它需要我们提供IDT的位置及大小的描述，这个描述的结构如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">                     * IDT Descriptor*</span><br><span class="line">|------------------------------------------------------------|</span><br><span class="line">|                                       |                    |</span><br><span class="line">|               Offset                  |      Size          |</span><br><span class="line">|                                       |                    |</span><br><span class="line">|------------------------------------------------------------|</span><br><span class="line">|47                                   16|15                 0|</span><br></pre></td></tr></table></figure></p>
+<p>如上图，IDTR和GDTR一样，共48位，分为两部分，其中</p>
+<ul>
+<li>0-15位是Size，是IDT的大小</li>
+<li>16-47位是偏移量，也就是IDT的线性地址</li>
+</ul>
+<p>同样的，我们在头文件中定义出来：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">idt_desc</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">uint16_t</span> size;</span><br><span class="line">    <span class="keyword">void</span>* offset;</span><br><span class="line">&#125; __attribute__((__packed__));</span><br></pre></td></tr></table></figure></p>
+<h5 id="加载IDT"><a href="#加载IDT" class="headerlink" title="加载IDT"></a>加载IDT</h5><p>然后在汇编代码中加载IDT即可：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mov $idt_descriptor, %ecx</span><br><span class="line">lidt (%ecx)</span><br></pre></td></tr></table></figure></p>
+<h4 id="ISR"><a href="#ISR" class="headerlink" title="ISR"></a>ISR</h4><p>Interrupt Service Routines，它的任务分为3步：</p>
+<ul>
+<li>保存当前状态</li>
+<li>执行中断处理程序</li>
+<li>恢复现场，返回被打断的程序</li>
+</ul>
+<p>前边说过，有些异常会向栈push错误码，但有些不会，为了降低复杂度，我们为没有错误码的异常向栈中push一个0，这样可以保证后续操作的一致性。为了跟踪是谁触发了中断，我们还要向栈push它的中断号，当然在做这些前，先禁用中断，为的是防止其他中断被触发。然后调用isr_commonHandler来保存处理器状态并调用C语言编写的中断处理程序，最后再恢复到中断之前的状态。代码如下：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 处理没有错误码的ISR */</span></span><br><span class="line">.macro isr no</span><br><span class="line">.global isr_\no</span><br><span class="line">isr_\no:</span><br><span class="line">    cli</span><br><span class="line">    push $<span class="number">0</span> <span class="comment">/* 对于没有错误码的异常，push一个0*/</span></span><br><span class="line">    push $\no</span><br><span class="line">    jmp isr_commonHandler</span><br><span class="line">.endm</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 处理有错误码的ISR */</span></span><br><span class="line">.macro isr_error_code no</span><br><span class="line">.global isr_\no</span><br><span class="line">isr_\no:</span><br><span class="line">    cli</span><br><span class="line">    <span class="comment">/* 有错误码的isr就不需要手动push了，已经自动push进错误码了 */</span></span><br><span class="line">    push $\no</span><br><span class="line">    jmp isr_commonHandler</span><br><span class="line">.endm</span><br><span class="line"></span><br><span class="line">isr_commonHandler:</span><br><span class="line">    pusha               <span class="comment">/* push edi, esi, ebp, esp, ebx, edx, ecx, eax */</span></span><br><span class="line">    push %ds</span><br><span class="line">    push %es</span><br><span class="line">    push %fs</span><br><span class="line">    push %gs</span><br><span class="line"></span><br><span class="line">    mov $<span class="number">0x10</span>, %ax      <span class="comment">/* 0x10是数据段的offset */</span></span><br><span class="line">    mov %ax, %ds</span><br><span class="line">    mov %ax, %es</span><br><span class="line">    mov %ax, %gs</span><br><span class="line">    mov %esp, %eax</span><br><span class="line">    push %eax</span><br><span class="line">    call interrupt_handler</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 恢复现场的顺序和保存现场的顺序正好相反 */</span></span><br><span class="line">    pop %eax</span><br><span class="line">    pop %gs</span><br><span class="line">    pop %fs</span><br><span class="line">    pop %es</span><br><span class="line">    pop %ds</span><br><span class="line">    popa            <span class="comment">/* pop edi, esi, ebp, esp, ebx, edx, ecx, eax */</span></span><br><span class="line"></span><br><span class="line">    add $<span class="number">8</span>, %esp    <span class="comment">/* 从堆栈中移除错误码和ISR号*/</span></span><br><span class="line">    iret            <span class="comment">/* pop cs, eip, eflags, ss, esp*/</span></span><br></pre></td></tr></table></figure></p>
+<p>根据上边我们保存的现场，定义C++中执行到ISR时上下文的样子：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">regs</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">uint32_t</span> gs, fs, es, ds;                          <span class="comment">/* 最后push的几个寄存器 */</span></span><br><span class="line">    <span class="keyword">uint32_t</span> edi, esi, ebp, esp, ebx, edx, ecx, eax;  <span class="comment">/* "pasha" 将数据压如这几个寄存器 */</span></span><br><span class="line">    <span class="keyword">uint32_t</span> int_no, err_code;                        <span class="comment">/* 我们"push $\no"就是将错误吗push到int_no中 */</span></span><br><span class="line">    <span class="keyword">uint32_t</span> eip, cs, eflags, useresp, ss;            <span class="comment">/* CPU自动压入 */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>然后是具体的处理程序，用C++编写。对于IDT中每一项都应该实现具体的处理程序，但现在我们只是简单的输出一行文字，作为捕获到中断的提示。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">void</span> <span class="title">interrupt_handler</span><span class="params">(struct regs *r)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 我们所有的ISR都将通过这个方法进入具体的处理程序</span></span><br><span class="line"><span class="comment">     * 现在只是简单的打印异常信息并通过一个死循环停止系统运行</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">if</span> (r-&gt;int_no &lt; <span class="number">32</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        Print::warnTerminal();</span><br><span class="line">        Print::<span class="built_in">printf</span>(<span class="string">"eax: 0x%x, ebx: 0x%x, ecx: 0x%x, edx: 0x%x\n"</span>, r-&gt;eax, r-&gt;ebx, r-&gt;ecx, r-&gt;edx);</span><br><span class="line">        Print::<span class="built_in">printf</span>(<span class="string">"edi: 0x%x, esi: 0x%x, ebp: 0x%x, esp: 0x%x\n"</span>, r-&gt;edi, r-&gt;esi, r-&gt;ebp, r-&gt;esp);</span><br><span class="line">        Print::<span class="built_in">printf</span>(<span class="string">"cs: 0x%x, eip: 0x%x, eflags: 0x%x, ss: 0x%x\n"</span>, r-&gt;cs, r-&gt;eip, r-&gt;eflags, r-&gt;ss);</span><br><span class="line">        Print::<span class="built_in">printf</span>(<span class="string">"%s"</span>, exception_messages[r-&gt;int_no]);</span><br><span class="line">        Print::<span class="built_in">printf</span>(<span class="string">" Exception. System Halted!\n"</span>);</span><br><span class="line">        <span class="keyword">while</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 定义一个空函数指针用来放具体的IRQ处理程序</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">void</span> (*handler)(struct regs *r);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (r-&gt;int_no &lt;= <span class="number">47</span> &amp;&amp; r-&gt;int_no &gt;=<span class="number">32</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        Print::<span class="built_in">printf</span>(<span class="string">"IRQ %d occurred!\n"</span>, r-&gt;int_no - <span class="number">32</span>);</span><br><span class="line">        handler = isr_routines[r-&gt;int_no - <span class="number">32</span>];</span><br><span class="line">        <span class="keyword">if</span> (handler)</span><br><span class="line">        &#123;</span><br><span class="line">            handler(r);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 中断处理结束后，要发送EOI(End Of Interrupt)给PIC的命令端口</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">if</span> (r-&gt;int_no &gt;= <span class="number">40</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            Hardwarecommunication::outportb(PIC2_COMMAND, PIC_EOI);</span><br><span class="line">        &#125;</span><br><span class="line">        Hardwarecommunication::outportb(PIC1_COMMAND, PIC_EOI);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        Print::<span class="built_in">printf</span>(<span class="string">"Unknow interrupt %u!\n"</span>, r-&gt;int_no);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在处理完基于IRQ的中断服务例程后，要向PIC的命令端口发送一个结束中断的信号EOI（End Of Interrupt）0x20，如果这个IRQ来自主PIC，那么只需要向主PIC发送EOI，若来自从PIC，则要向两个PIC都发送一个EOI。</p>
+<p>中断的内容基本讲完了，后边可能还会扩充。下篇文章开启分页，晚安。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://samypesse.gitbooks.io/how-to-create-an-operating-system/content/Chapter-7/#" target="_blank" rel="noopener">IDT and interrupts</a><br><a href="https://wiki.osdev.org/Interrupts" target="_blank" rel="noopener">Interrupts</a><br><a href="https://wiki.osdev.org/Interrupt_Descriptor_Table" target="_blank" rel="noopener">Interrupt Descriptor Table</a><br><a href="http://www.osdever.net/tutorials/view/irqs" target="_blank" rel="noopener">IRQs by Ralph E. Griffin</a><br><a href="http://www.osdever.net/bkerndev/Docs/irqs.htm" target="_blank" rel="noopener">IRQs and PICs</a><br><a href="https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-manual-325462.pdf" target="_blank" rel="noopener">64-ia-32-architectures-software-developer-manual-325462</a><br><a href="https://wiki.osdev.org/PIC" target="_blank" rel="noopener">8259 PIC</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/IDT/" rel="tag"># IDT</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+            
+               <div id="needsharebutton-postbottom">
+                 <span class="btn">
+                    <i class="fa fa-share-alt" aria-hidden="true"></i>
+                 </span>
+               </div>
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/12/Function-pointer/" rel="next" title="C/C++中的函数指针">
+                <i class="fa fa-chevron-left"></i> C/C++中的函数指针
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/21/Paging/" rel="prev" title="开启分页">
+                开启分页 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://inlow.xiaojumao.club/INLOW-icon.png" alt="Qv Junping">
+            
+              <p class="site-author-name" itemprop="name">Qv Junping</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/qvjp" title="GitHub &rarr; https://github.com/qvjp" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:qvjunping@gmail.com" title="E-Mail &rarr; mailto:qvjunping@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://www.zhihu.com/people/trouble_Q" title="Zhihu &rarr; https://www.zhihu.com/people/trouble_Q" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.csdn.net/lxfHaHaHa" title="https://blog.csdn.net/lxfHaHaHa" rel="noopener" target="_blank">李秀峰的Java博客</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.normalhamal.online/" title="https://blog.normalhamal.online/" rel="noopener" target="_blank">normalHamal的前端博客</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#中断概览"><span class="nav-number">1.</span> <span class="nav-text">中断概览</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#异常（Exceptions）"><span class="nav-number">1.1.</span> <span class="nav-text">异常（Exceptions）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#中断请求（IRQs）"><span class="nav-number">1.2.</span> <span class="nav-text">中断请求（IRQs）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#软中断（Software-Interrupt）"><span class="nav-number">1.3.</span> <span class="nav-text">软中断（Software Interrupt）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#中断流程"><span class="nav-number">2.</span> <span class="nav-text">中断流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何实现中断"><span class="nav-number">3.</span> <span class="nav-text">如何实现中断</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置PIC"><span class="nav-number">3.1.</span> <span class="nav-text">配置PIC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置IDT"><span class="nav-number">3.2.</span> <span class="nav-text">设置IDT</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#IDT结构"><span class="nav-number">3.2.1.</span> <span class="nav-text">IDT结构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#IDTR结构"><span class="nav-number">3.2.2.</span> <span class="nav-text">IDTR结构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#加载IDT"><span class="nav-number">3.2.3.</span> <span class="nav-text">加载IDT</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ISR"><span class="nav-number">3.3.</span> <span class="nav-text">ISR</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Qv Junping</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数">95k</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长">3:58</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.7.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=6.7.0"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=6.7.0"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  <script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  <script>
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item) > -1;
+    });
+    new Valine({
+      el: '#comments' ,
+      verify: false,
+      notify: false,
+      appId: 'Ag0DRe0DuE0IcF5iX5QymBJi-gzGzoHsz',
+      appKey: '4vwW6ea2r2gO8iNHal50FI60',
+      placeholder: 'Just go go',
+      avatar: 'robohash',
+      meta:guest,
+      pageSize: '10' || 10,
+      visitor: false
+    });
+  </script>
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+  <script>
+    
+      pbOptions = {};
+      
+        pbOptions.iconStyle = "box";
+      
+        pbOptions.boxForm = "horizontal";
+      
+        pbOptions.position = "bottomCenter";
+      
+        pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function (i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap');
+      $(e).after($wrap);
+      $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function (e) {
+        var code = $(this).parent().find('.code').find('.line').map(function (i, e) {
+          return $(e).text();
+        }).toArray().join('\n');
+        var ta = document.createElement('textarea');
+        var range = document.createRange(); //For Chrome
+        var sel = window.getSelection(); //For Chrome
+        var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+        ta.style.top = yPosition + 'px'; //Prevent page scroll
+        ta.style.position = 'absolute';
+        ta.style.opacity = '0';
+        ta.value = code;
+        ta.textContent = code; //For FireFox
+        ta.contentEditable = true;
+        ta.readOnly = false;
+        document.body.appendChild(ta);
+        range.selectNode(ta);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        ta.setSelectionRange(0, code.length);
+        var result = document.execCommand('copy');
+        
+        ta.blur(); //For iOS
+        $(this).blur();
+      })).on('mouseleave', function (e) {
+        var $b = $(this).find('.copy-btn');
+        setTimeout(function () {
+          $b.text('复制');
+        }, 300);
+      }).append(e);
+    })
+  </script>
+
+
+  
+
+</body>
+</html>
