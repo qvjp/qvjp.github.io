@@ -123,7 +123,7 @@
 <meta property="og:description" content="有了上篇的GDT，可以着手设置中断了，终于到了有意思的地方，加油。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://inlow.xiaojumao.club/Interrupts.png">
-<meta property="og:updated_time" content="2020-06-20T13:48:29.110Z">
+<meta property="og:updated_time" content="2020-06-20T16:52:56.001Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="开启中断">
 <meta name="twitter:description" content="有了上篇的GDT，可以着手设置中断了，终于到了有意思的地方，加油。">
@@ -429,7 +429,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-06-20 21:48:29" itemprop="dateModified" datetime="2020-06-20T21:48:29+08:00">2020-06-20</time>
+                <time title="修改时间：2020-06-21 00:52:56" itemprop="dateModified" datetime="2020-06-21T00:52:56+08:00">2020-06-21</time>
               
             
           </span>
@@ -498,7 +498,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">9.8k</span>
+                <span title="本文字数">9.9k</span>
               
 
               
@@ -542,7 +542,7 @@
 </ul>
 <p>在异常中，有些在发生时会向栈顶压入一个32位的错误码，提供错误的额外信息。</p>
 <h4 id="中断请求（IRQs）"><a href="#中断请求（IRQs）" class="headerlink" title="中断请求（IRQs）"></a>中断请求（IRQs）</h4><p>Interrupt ReQuest，IRQs又叫硬中断，信号来自芯片组的外部。比如一些设备当数据准备好等待去读取时可能会发送一个IRQ，另一些设备则可能是完成某个命令，比如向磁盘写入一个buffer后也会发送一个IRQ。总之就是一个设备想让CPU注意，就会产生一个IRQ。而这些设备是包含从网卡到鼠标到串口的一切设备。</p>
-<h4 id="软中断（Software-Interrupt）"><a href="#软中断（Software-Interrupt）" class="headerlink" title="软中断（Software Interrupt）"></a>软中断（Software Interrupt）</h4><p>这个一般来说就是系统调用，顾名思义就是用软件设置的中断。是某个软件要进行某个操作而需要引起CPU的注意。在x86中，使用<code>INT</code>来开启软中断，可以使用256个中断向量中的任意一个来作为软中断，INLOW和其他类UNIX一样，使用0x80。</p>
+<h4 id="软中断（Software-Interrupt）"><a href="#软中断（Software-Interrupt）" class="headerlink" title="软中断（Software Interrupt）"></a>软中断（Software Interrupt）</h4><p>这个一般来说就是系统调用，顾名思义就是用软件设置的中断。是某个软件要进行某个操作而需要引起CPU的注意。在x86中，使用<code>INT</code>来开启软中断，可以使用256个中断向量中的任意一个来作为软中断，INLOW使用0x49。</p>
 <h3 id="中断流程"><a href="#中断流程" class="headerlink" title="中断流程"></a>中断流程</h3><hr>
 <p>下边先上个示意图，然后根据示意图的流程来一步步理清楚中断到底是怎么回事。<br><img src="https://inlow.xiaojumao.club/Interrupts.png" alt="Interrupt"><br>可以看到，处理一次中断，期间涉及到的设备或概念有：</p>
 <ul>
@@ -561,7 +561,7 @@
 <li>设置并加载IDT</li>
 <li>实现ISR处理程序（这里仅先实现部分IRQs和Exceptions）</li>
 </ul>
-<h4 id="配置PIC"><a href="#配置PIC" class="headerlink" title="配置PIC"></a>配置PIC</h4><p>前边说过，PIC是由两块8259芯片组成，每块有8个输入管脚，一个输出管脚。从PIC的输出管脚连接主PIC的第3个输入管脚（IR2），主PIC的输出管脚连接CPU。所以当从PIC接收到中断信息要先告诉主PIC，主PIC在通知CPU，这种模式称为“层叠模式”（cascade）。因为主PIC的第三个输入管脚连接到了从PIC，所以IRQ2不能发生。<br>当设备发送给PIC芯片一个中断信号后，PIC直接或间接的告诉CPU中断发生，当CPU确认中断发生后，PIC发送中断号给CPU，中断号是从00H（0）~FFH（255）。但系统初始化时BIOS会将IRQ的0~7设为中断的08H（8）~0FH（15）号，IRQ的8~15设为中断的70H（112）~77H（119）号。而CPU保留了中断号0~31，那么假如CPU接收到INT 8时，到底是系统保留异常的Double Fault，还是IRQ0 Devide-by-zero呢？当然可以通过一些方法确定到底是哪个设备发出的请求，但这些方法不一定一直可用，最好的方法是配置一下PIC，使其不要映射到中断的0~15号。这里是将IRQ的0~7设为中断的20H（32）~27H（39）号，IRQ的8~15设为中断的28H（40）~2FH（47）号<br>如何重新映射IRQ到INT的关系呢？先上核心代码，再解释：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq_remap</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">/* 开始初始化序列 */</span></span><br><span class="line">    outportb(PIC1_COMMAND, <span class="number">0x11</span>);</span><br><span class="line">    outportb(PIC2_COMMAND, <span class="number">0x11</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 主PIC向量偏移0x20(也就是主PIC重新映射后是从INT的32-39)，从PIC向量偏移0x28(从PIC40-47) */</span></span><br><span class="line">    outportb(PIC1_DATA, <span class="number">0x20</span>);</span><br><span class="line">    outportb(PIC2_DATA, <span class="number">0x28</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 告诉主PIC在IRQ2(0000 0100)有从PIC</span></span><br><span class="line"><span class="comment">     * 告诉从PIC它的层叠号吗(0000 0010)</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    outportb(PIC1_DATA, <span class="number">0x04</span>);</span><br><span class="line">    outportb(PIC2_DATA, <span class="number">0x02</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * ICW4</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    outportb(PIC1_DATA, <span class="number">0x01</span>);</span><br><span class="line">    outportb(PIC2_DATA, <span class="number">0x01</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="配置PIC"><a href="#配置PIC" class="headerlink" title="配置PIC"></a>配置PIC</h4><p>前边说过，PIC是由两块8259芯片组成，每块有8个输入管脚，一个输出管脚。从PIC的输出管脚连接主PIC的第3个输入管脚（IR2），主PIC的输出管脚连接CPU。所以当从PIC接收到中断信息要先告诉主PIC，主PIC在通知CPU，这种模式称为“层叠模式”（cascade）。因为主PIC的第三个输入管脚连接到了从PIC，所以IRQ2不能发生。<br>当设备发送给PIC芯片一个中断信号后，PIC直接或间接的告诉CPU中断发生，当CPU确认中断发生后，PIC发送中断号给CPU，中断号是从00H（0）~FFH（255）。但系统初始化时BIOS会将IRQ的0~7设为中断的08H（8）~0FH（15）号，IRQ的8~15设为中断的70H（112）~77H（119）号。而CPU保留了中断号0~31，那么假如CPU接收到INT 8时，到底是系统保留异常的Double Fault，还是IRQ0 Devide-by-zero呢？当然可以通过一些方法确定到底是哪个设备发出的请求，但这些方法不一定一直可用，最好的方法是配置一下PIC，使其不要映射到中断的0~15号。这里是将IRQ的0~7设为中断的20H（32）~27H（39）号，IRQ的8~15设为中断的28H（40）~2FH（47）号。即：[0,15]-&gt;[32,47]。<br>如何重新映射IRQ到INT的关系呢？先上核心代码，再解释：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq_remap</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">/* 开始初始化序列 */</span></span><br><span class="line">    outportb(PIC1_COMMAND, <span class="number">0x11</span>);</span><br><span class="line">    outportb(PIC2_COMMAND, <span class="number">0x11</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 主PIC向量偏移0x20(也就是主PIC重新映射后是从INT的32-39)，从PIC向量偏移0x28(从PIC40-47) */</span></span><br><span class="line">    outportb(PIC1_DATA, <span class="number">0x20</span>);</span><br><span class="line">    outportb(PIC2_DATA, <span class="number">0x28</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 告诉主PIC在IRQ2(0000 0100)有从PIC</span></span><br><span class="line"><span class="comment">     * 告诉从PIC它的层叠号吗(0000 0010)</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    outportb(PIC1_DATA, <span class="number">0x04</span>);</span><br><span class="line">    outportb(PIC2_DATA, <span class="number">0x02</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * ICW4</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    outportb(PIC1_DATA, <span class="number">0x01</span>);</span><br><span class="line">    outportb(PIC2_DATA, <span class="number">0x01</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>每一个PIC芯片都有一个命令端口和一个数据端口，主PIC的命令端口在0x20，数据端口在0x21；从PIC的命令端口在0xA0，数据端口在0xA1。初始化PIC可能用到4个初始命令字（Initialization Command Word），按顺序向指定端口设置4个ICW就可以完成PIC的初始化工作，也就实现了从新映射的目的。下边看一下ICW的配置细节：</p>
 <ul>
 <li><p>ICW1 开始初始化PIC（向命令端口写入）</p>
@@ -984,7 +984,7 @@
       <i class="fa fa-coffee"></i>
     </span>
     
-    <span title="站点阅读时长">3:56</span>
+    <span title="站点阅读时长">3:57</span>
   
 </div>
 
