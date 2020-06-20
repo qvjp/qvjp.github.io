@@ -114,18 +114,18 @@
 
 
 
-  <meta name="description" content="这篇博客我们将为INLOW创建一个交叉编译器。">
+  <meta name="description" content="这篇博客将为INLOW创建一个交叉编译器。">
 <meta name="keywords" content="GCC,Cross-Compiler">
 <meta property="og:type" content="article">
 <meta property="og:title" content="GCC-Cross-Compiler">
 <meta property="og:url" content="https://blog.inlow.online/2019/01/04/GCC-Cross-Compiler/index.html">
 <meta property="og:site_name" content="INLOW开发博客">
-<meta property="og:description" content="这篇博客我们将为INLOW创建一个交叉编译器。">
+<meta property="og:description" content="这篇博客将为INLOW创建一个交叉编译器。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-05-27T15:22:16.000Z">
+<meta property="og:updated_time" content="2020-06-20T13:48:29.106Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="GCC-Cross-Compiler">
-<meta name="twitter:description" content="这篇博客我们将为INLOW创建一个交叉编译器。">
+<meta name="twitter:description" content="这篇博客将为INLOW创建一个交叉编译器。">
 
 
 
@@ -427,7 +427,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-05-27 23:22:16" itemprop="dateModified" datetime="2020-05-27T23:22:16+08:00">2020-05-27</time>
+                <time title="修改时间：2020-06-20 21:48:29" itemprop="dateModified" datetime="2020-06-20T21:48:29+08:00">2020-06-20</time>
               
             
           </span>
@@ -496,7 +496,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">3.7k</span>
+                <span title="本文字数">3.6k</span>
               
 
               
@@ -530,16 +530,16 @@
       
 
       
-        <p>这篇博客我们将为INLOW创建一个交叉编译器。</p>
+        <p>这篇博客将为INLOW创建一个交叉编译器。</p>
 <a id="more"></a>
 <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><hr>
-<p>通常来说，交叉编译器就是可以在平台A运行（编译代码），生成可以运行在目标平台B的目标程序的编译器。这两个平台通常有不同的CPU、OS、可执行文件的格式。我们这里的平台A就是指当前操作系统，目标平台B就是我们要开发的操作系统。要时刻意识到这两个平台是不同的。</p>
-<h4 id="为什么需要一个交叉编译器"><a href="#为什么需要一个交叉编译器" class="headerlink" title="为什么需要一个交叉编译器"></a>为什么需要一个交叉编译器</h4><p>我们需要一个交叉编译器，除非我们在自己的操作系统上进行开发。编译器必须知道正确的目标平台（包括CPU和OS），否则将会出现问题。有些人会建议使用本来系统的编译器，通过设置一大堆复杂的可选参数来实现跨平台编译。这将给我们将来造成很大的问题，解决的方法只有构建一个交叉编译器。</p>
+<p>通常来说，交叉编译器就是可以在平台A运行（编译代码），生成可以运行在目标平台B的目标程序的编译器。这两个平台通常有不同的CPU、OS、可执行文件的格式。这里的平台A就是指当前操作系统，目标平台B就是要开发的操作系统。要时刻意识到这两个平台是不同的。</p>
+<h4 id="为什么需要一个交叉编译器"><a href="#为什么需要一个交叉编译器" class="headerlink" title="为什么需要一个交叉编译器"></a>为什么需要一个交叉编译器</h4><p>需要一个交叉编译器，除非在自己的操作系统上进行开发。编译器必须知道正确的目标平台（包括CPU和OS），否则将会出现问题。有些人会建议使用本来系统的编译器，通过设置一大堆复杂的可选参数来实现跨平台编译。这将给将来造成很大的问题，解决的方法只有构建一个交叉编译器。</p>
 <h4 id="需要什么版本的编译器"><a href="#需要什么版本的编译器" class="headerlink" title="需要什么版本的编译器"></a>需要什么版本的编译器</h4><p>建议使用最新的大版本更新GCC。例如，如果你用GCC 4.6.3来构建GCC 4.8.0的交叉编译器可能会出错。所以，这里建议你先将系统的GCC升级到最新版本。<br>当然你也可以使用你系统上较旧的发布版，只要不是太旧，这样你只需要选择最新的次要版本来作为交叉编译器（比如你系统是4.6.1，那么可以选4.6.3来作为交叉编译器的版本）。<br>也可以使用较旧的主要发布版GCC来构建更新的主要版本GCC。例如，GCC4.7.3可能会构建4.8.0的交叉编译器。<br>查看本机GCC版本可以使用：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gcc --version</span><br></pre></td></tr></table></figure></p>
 <p>另外Binutils也应该使用最新的主要发布版，但是注意，并不是所有版本的Binutils和GCC都可以完美的混合使用，如果出现问题，可以试试使用与GCC发布时间大致相同的版本。</p>
 <h4 id="决定目标平台"><a href="#决定目标平台" class="headerlink" title="决定目标平台"></a>决定目标平台</h4><p>INLOW运行在x86的CPU上，所以交叉编译器是i686-elf。</p>
 <h3 id="编译前要做的事"><a href="#编译前要做的事" class="headerlink" title="编译前要做的事"></a>编译前要做的事</h3><hr>
-<p>GCC（CNU Compiler Collection）是一个带有很多依赖项的高级软件，我们需要下边这些来构建GCC：</p>
+<p>GCC（CNU Compiler Collection）是一个带有很多依赖项的高级软件，需要下边这些来构建GCC：</p>
 <ul>
 <li>类Unix环境（Windows用户可以使用WSL或Cygwin）</li>
 <li>足够的内存和硬盘空间</li>
@@ -554,7 +554,7 @@
 <li>ISL（可选）</li>
 <li>CLooG（可选）</li>
 </ul>
-<p>我们需要Texinfo来构建Binutils，GMP、MPC和MPFR来构建GCC。这些工具都可以从对应网站下载源码编译安装，或用各系统包管理器安装：</p>
+<p>需要Texinfo来构建Binutils，GMP、MPC和MPFR来构建GCC。这些工具都可以从对应网站下载源码编译安装，或用各系统包管理器安装：</p>
 <table>
 <thead>
 <tr>
@@ -622,16 +622,16 @@
 <li>GCC可以从这里下<a href="https://gnu.org/software/gcc/" target="_blank" rel="noopener">GCC website</a></li>
 </ul>
 <h3 id="构建交叉编译器"><a href="#构建交叉编译器" class="headerlink" title="构建交叉编译器"></a>构建交叉编译器</h3><hr>
-<p>在这里需要决定把编译器安装到哪个位置。一个很危险的坏习惯是把它安装到系统目录，一般而言安装到$HOME/cross是很好的（你自己使用），若要让所有用户都可用，通常安装到/usr/local/cross。<br>注意，我们构建所有东西都在源码树之外，这是一个很好的做法。</p>
+<p>在这里需要决定把编译器安装到哪个位置。一个很危险的坏习惯是把它安装到系统目录，一般而言安装到$HOME/cross是很好的（你自己使用），若要让所有用户都可用，通常安装到/usr/local/cross。<br>注意，构建所有东西都在源码树之外，这是一个很好的做法。</p>
 <h4 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PREFIX=<span class="string">"<span class="variable">$HOME</span>/cross"</span></span><br><span class="line"><span class="built_in">export</span> TARGET=i686-elf</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">"<span class="variable">$PREFIX</span>/bin:<span class="variable">$PATH</span>"</span></span><br></pre></td></tr></table></figure>
-<p>我们把安装路径加入PATH是为了安装完成后可以直接知道是否安装成功。<br>这个前缀（prefix）将会配置构建进程，将交叉编译环境全部放到$HOME/cross/。你可以更改这个路径到任何你喜欢的地方。但是最好不要讲这个前缀设置为/usr，因为这样交叉编译器将会和系统编译器放到一起，可能会引起一系列问题（比如把TARGET写错会覆盖系统编译器，或者引起系统包管理器的冲突）。</p>
+<p>把安装路径加入PATH是为了安装完成后可以直接知道是否安装成功。<br>这个前缀（prefix）将会配置构建进程，将交叉编译环境全部放到$HOME/cross/。你可以更改这个路径到任何你喜欢的地方。但是最好不要讲这个前缀设置为/usr，因为这样交叉编译器将会和系统编译器放到一起，可能会引起一系列问题（比如把TARGET写错会覆盖系统编译器，或者引起系统包管理器的冲突）。</p>
 <h4 id="Binutils"><a href="#Binutils" class="headerlink" title="Binutils"></a>Binutils</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> <span class="variable">$HOME</span>/src</span><br><span class="line"> </span><br><span class="line">mkdir build-binutils</span><br><span class="line"><span class="built_in">cd</span> build-binutils</span><br><span class="line">../binutils-x.y.z/configure --target=<span class="variable">$TARGET</span> --prefix=<span class="string">"<span class="variable">$PREFIX</span>"</span> --with-sysroot --<span class="built_in">disable</span>-nls --<span class="built_in">disable</span>-werror</span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
 <p>编译Binutils，可以在你当前操作系统上运行，但可以生成指定的目标代码。<br><code>--disable-nls</code>是一个可选操作，是禁用本地语言支持，这样可以减少构建时间。<br><code>--with-sysroot</code>告诉Binutils在交叉编译器中开启sysroot支持，通过指向默认的空目录。</p>
-<h4 id="GCC"><a href="#GCC" class="headerlink" title="GCC"></a>GCC</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> <span class="variable">$HOME</span>/src</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 目录$PREFIX/bin已经在PATH中了，我们在上边设置过。</span></span><br><span class="line"><span class="built_in">which</span> -- <span class="variable">$TARGET</span>-as || <span class="built_in">echo</span> <span class="variable">$TARGET</span>-as is not <span class="keyword">in</span> the PATH</span><br><span class="line"> </span><br><span class="line">mkdir build-gcc</span><br><span class="line"><span class="built_in">cd</span> build-gcc</span><br><span class="line">../gcc-x.y.z/configure --target=<span class="variable">$TARGET</span> --prefix=<span class="string">"<span class="variable">$PREFIX</span>"</span> --<span class="built_in">disable</span>-nls --<span class="built_in">enable</span>-languages=c,c++ --without-headers</span><br><span class="line">make all-gcc</span><br><span class="line">make all-target-libgcc</span><br><span class="line">make install-gcc</span><br><span class="line">make install-target-libgcc</span><br></pre></td></tr></table></figure>
+<h4 id="GCC"><a href="#GCC" class="headerlink" title="GCC"></a>GCC</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> <span class="variable">$HOME</span>/src</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 目录$PREFIX/bin已经在PATH中了，在上边设置过。</span></span><br><span class="line"><span class="built_in">which</span> -- <span class="variable">$TARGET</span>-as || <span class="built_in">echo</span> <span class="variable">$TARGET</span>-as is not <span class="keyword">in</span> the PATH</span><br><span class="line"> </span><br><span class="line">mkdir build-gcc</span><br><span class="line"><span class="built_in">cd</span> build-gcc</span><br><span class="line">../gcc-x.y.z/configure --target=<span class="variable">$TARGET</span> --prefix=<span class="string">"<span class="variable">$PREFIX</span>"</span> --<span class="built_in">disable</span>-nls --<span class="built_in">enable</span>-languages=c,c++ --without-headers</span><br><span class="line">make all-gcc</span><br><span class="line">make all-target-libgcc</span><br><span class="line">make install-gcc</span><br><span class="line">make install-target-libgcc</span><br></pre></td></tr></table></figure>
 <p>libgcc，编译器在编译时可用的一个低级支持库。<br><code>--disable-nls</code>禁用本地语言支持。<br><code>--without-headers</code>告诉GCC生成目标程序时不依赖任何C库（标准C库或运行时库）。<br><code>--enable-languages</code>告诉GCC支持哪些编程语言的编译。</p>
-<h3 id="使用新编译器"><a href="#使用新编译器" class="headerlink" title="使用新编译器"></a>使用新编译器</h3><p>现在你已经有了一个“裸露”的交叉编译器，他没有任何C库或C运行时支持，所以在编写代码时不能用任何标准include或创建可运行程序。但是它十分适合编写我们的操作系统。<br>现在我们所需的所有交叉编译环境都在$HOME/cross中，可以这样查看版本<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$HOME</span>/cross/bin/<span class="variable">$TARGET</span>-gcc --version</span><br></pre></td></tr></table></figure></p>
+<h3 id="使用新编译器"><a href="#使用新编译器" class="headerlink" title="使用新编译器"></a>使用新编译器</h3><p>现在你已经有了一个“裸露”的交叉编译器，他没有任何C库或C运行时支持，所以在编写代码时不能用任何标准include或创建可运行程序。但是它十分适合编写的操作系统。<br>现在所需的所有交叉编译环境都在$HOME/cross中，可以这样查看版本<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$HOME</span>/cross/bin/<span class="variable">$TARGET</span>-gcc --version</span><br></pre></td></tr></table></figure></p>
 <p>可以把下边代码加入.zshrc（如果所用shell是zsh）或.bashrc（如果所用shell是bash）或其他类似文件，以使在任何shell中都可以直接只用交叉编译器，而不用写冗长的路径。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH=&quot;$HOME/cross/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></p>
-<p>现在这个编译器不能编译正常的C程序，就是那些使用#include引用了标准头文件（除了一些平台独立的，编译器自己生成的头文件）的程序。这是很正确的，因为我们没有任何标准C库。<br>C标准定义了两种类型的执行环境 - “freestanding”和“hosted”。当我们在开发操作系统内核时，要使用“freestanding”，其他任何用户态程序都是“hosted”的。“freestanding”环境需要提供C库的一个子集：float.h, iso646.h, limits.h, stdalign.h, stdarg.h, stdbool.h, stddef.h, stdint.h和stdnoreturn.h（C11）。</p>
+<p>现在这个编译器不能编译正常的C程序，就是那些使用#include引用了标准头文件（除了一些平台独立的，编译器自己生成的头文件）的程序。这是很正确的，因为没有任何标准C库。<br>C标准定义了两种类型的执行环境 - “freestanding”和“hosted”。当在开发操作系统内核时，要使用“freestanding”，其他任何用户态程序都是“hosted”的。“freestanding”环境需要提供C库的一个子集：float.h, iso646.h, limits.h, stdalign.h, stdarg.h, stdbool.h, stddef.h, stdint.h和stdnoreturn.h（C11）。</p>
 <h4 id="构建视频"><a href="#构建视频" class="headerlink" title="构建视频"></a>构建视频</h4><video src="https://oss.normalhamal.online/gcc-build.mp4" controls="controls" style="max-width: 100%; display: block; margin-left: auto; margin-right: auto;"><br>your browser does not support the video tag<br></video>
 
 <h3 id="可能遇到的问题"><a href="#可能遇到的问题" class="headerlink" title="可能遇到的问题"></a>可能遇到的问题</h3><hr>
@@ -1005,7 +1005,7 @@
       <i class="fa fa-coffee"></i>
     </span>
     
-    <span title="站点阅读时长">3:58</span>
+    <span title="站点阅读时长">3:56</span>
   
 </div>
 

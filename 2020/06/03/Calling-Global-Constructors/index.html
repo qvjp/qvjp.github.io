@@ -122,7 +122,7 @@
 <meta property="og:site_name" content="INLOW开发博客">
 <meta property="og:description" content="这篇文章介绍全局构造函数（Global Constructors）是怎么回事，并实现一个简单的全局构造函数。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-06-03T15:55:57.217Z">
+<meta property="og:updated_time" content="2020-06-20T13:48:29.106Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Calling-Global-Constructors">
 <meta name="twitter:description" content="这篇文章介绍全局构造函数（Global Constructors）是怎么回事，并实现一个简单的全局构造函数。">
@@ -410,12 +410,24 @@
                 
               
 
-              <time title="创建时间：2020-06-03 21:14:45 / 修改时间：23:55:57" itemprop="dateCreated datePublished" datetime="2020-06-03T21:14:45+08:00">2020-06-03</time>
+              <time title="创建时间：2020-06-03 21:14:45" itemprop="dateCreated datePublished" datetime="2020-06-03T21:14:45+08:00">2020-06-03</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-06-20 21:48:29" itemprop="dateModified" datetime="2020-06-20T21:48:29+08:00">2020-06-20</time>
               
             
           </span>
@@ -521,13 +533,13 @@
         <p>这篇文章介绍全局构造函数（Global Constructors）是怎么回事，并实现一个简单的全局构造函数。<br><a id="more"></a></p>
 <p>全局构造函数就是在程序入口函数（_start）之前执行的函数，它负责解析命令行参数、初始化标准库、初始化内存、信号等等。运行全局初始化函数之后再运行<code>exit(main(argc, argv))</code>。下边表述的都是基于GCC编译器，其他编译器可能有其他表现。</p>
 <p>一般而言，全局构造函数/全局析构函数都被存储在一个函数指针数组里，调用这些函数就像是遍历数组并执行每个元素。但是编译器并不总是把这个列表的权限开放给使用者，这时候需要配合编译器，做一些适配来使用这个特性。</p>
-<h3 id="GCC-System-V-ABI"><a href="#GCC-System-V-ABI" class="headerlink" title="GCC - System V ABI"></a>GCC - System V ABI</h3><p>我们现在使用的编译器是<code>i686-elf-gcc</code>，它与其他比如<code>x86_64-elf-gcc</code>等都是实现了System V ABI，使用5个不同的结构来控制程序的初始化，分别为：<code>crt0.o</code>、<code>crti.o</code>、<code>crtbegin.o</code>、<code>crtend.o</code>和<code>crtn.o</code>，它们5个共同实现了两个函数：<code>_init</code>和<code>_fini</code>，分别用来进行全局初始化和全局析构。</p>
-<p>这种方案使得编译器可以很好的控制程序的初始化，但需要配合编译器做一些适配工作，所幸这很简单。编译器提供了上述5个文件中的两个：<code>crtbegin.o</code>和<code>crtend.o</code>，这两个文件包含编译器希望我们使用但是又希望隐藏细节的内部文件。要使用它们需要实现自己的<code>crti.o</code>和<code>crtn.o</code>。而<code>crt0.o</code>包含程序的入口点（通常是_start)，并调用另外4个文件实现的<code>_init</code>函数和<code>_fini</code>函数，在内核中，包含<code>_start</code>函数的文件就表示<code>crt0.o</code>。</p>
+<h3 id="GCC-System-V-ABI"><a href="#GCC-System-V-ABI" class="headerlink" title="GCC - System V ABI"></a>GCC - System V ABI</h3><p>现在使用的编译器是<code>i686-elf-gcc</code>，它与其他比如<code>x86_64-elf-gcc</code>等都是实现了System V ABI，使用5个不同的结构来控制程序的初始化，分别为：<code>crt0.o</code>、<code>crti.o</code>、<code>crtbegin.o</code>、<code>crtend.o</code>和<code>crtn.o</code>，它们5个共同实现了两个函数：<code>_init</code>和<code>_fini</code>，分别用来进行全局初始化和全局析构。</p>
+<p>这种方案使得编译器可以很好的控制程序的初始化，但需要配合编译器做一些适配工作，所幸这很简单。编译器提供了上述5个文件中的两个：<code>crtbegin.o</code>和<code>crtend.o</code>，这两个文件包含编译器希望使用但是又希望隐藏细节的内部文件。要使用它们需要实现自己的<code>crti.o</code>和<code>crtn.o</code>。而<code>crt0.o</code>包含程序的入口点（通常是_start)，并调用另外4个文件实现的<code>_init</code>函数和<code>_fini</code>函数，在内核中，包含<code>_start</code>函数的文件就表示<code>crt0.o</code>。</p>
 <p>为了搞清楚到底是怎么回事，下边举个例子：</p>
 <p>下边程序由两个obj文件链接而成<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i686-elf-gcc foo.o bar.o -o program</span><br></pre></td></tr></table></figure></p>
 <p>GCC将重写上述命令为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i686-elf-ld crt0.o crti.o crtbegin.o foo.o bar.o crtend.o crtn.o</span><br></pre></td></tr></table></figure></p>
 <p>重写后的指令意思是要在链接期间将5个obj文件和用户自己的程序链接到一起，从而形成<code>_init</code>和<code>_fini</code>函数，这两个函数分别存储在<code>.ini</code>section和<code>.fini</code>section。这5个obj文件每个向这些section中贡献一部分内容，<code>crti.o</code>提供函数标头，<code>crtbegin.o</code>和<code>crtend.o</code>提供函数主体，<code>crtn.o</code>提供最后的return语句，这里要注意的是链接顺序，如果没有按此顺序链接可能会出现奇怪的问题。</p>
-<h3 id="在内核中使用crti-o-crtbegin-o-crtend-o-crtn-o"><a href="#在内核中使用crti-o-crtbegin-o-crtend-o-crtn-o" class="headerlink" title="在内核中使用crti.o crtbegin.o crtend.o crtn.o"></a>在内核中使用crti.o crtbegin.o crtend.o crtn.o</h3><p>在内核中没有用户态的libc库，你可能使用一个特殊的“libc”或者根本啥也没有。一般情况下，编译器都会提供<code>crtbegin.o</code>和<code>crtend.o</code>，但<code>crti.o</code>和<code>crtn.o</code>没有。内核应该自己提供所需要的<code>crti.o</code>和<code>crtn.o</code>（即使和用户态的完全相同）。当写好了自己的这两个文件后，需要和内核提供的两个一起链接到其他目标文件中，我们自己这两个文件的目录当然可以自己指定，但是内核提供的两个文件路径怎么获取呢？GCC提供了方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i686-elf-gcc $CFLAGS -print-file-name=crtbegin.o</span><br></pre></td></tr></table></figure></p>
+<h3 id="在内核中使用crti-o-crtbegin-o-crtend-o-crtn-o"><a href="#在内核中使用crti-o-crtbegin-o-crtend-o-crtn-o" class="headerlink" title="在内核中使用crti.o crtbegin.o crtend.o crtn.o"></a>在内核中使用crti.o crtbegin.o crtend.o crtn.o</h3><p>在内核中没有用户态的libc库，你可能使用一个特殊的“libc”或者根本啥也没有。一般情况下，编译器都会提供<code>crtbegin.o</code>和<code>crtend.o</code>，但<code>crti.o</code>和<code>crtn.o</code>没有。内核应该自己提供所需要的<code>crti.o</code>和<code>crtn.o</code>（即使和用户态的完全相同）。当写好了自己的这两个文件后，需要和内核提供的两个一起链接到其他目标文件中，自己这两个文件的目录当然可以自己指定，但是内核提供的两个文件路径怎么获取呢？GCC提供了方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i686-elf-gcc $CFLAGS -print-file-name=crtbegin.o</span><br></pre></td></tr></table></figure></p>
 <p>可以通过这样的方式来获取<code>crtbegin.o</code>的绝对路径，同样也可以获取到<code>crtend.o</code>的路径，然后和自己的两个文件一起，连接到其他目标文件中。</p>
 <p>下边给出简单的<code>crti.s</code>和<code>crtn.s</code>的代码，仅供参考：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">.section .init</span><br><span class="line">.global _init</span><br><span class="line">_init:</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 下边两行是保存ebp(基址寄存器)和调用前的esp(栈顶地址)，即保存整个栈的内容</span></span><br><span class="line"><span class="comment">     * 方便调用后的恢复</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    push %ebp</span><br><span class="line">    mov %esp, %ebp</span><br><span class="line">    <span class="comment">/** GCC将把crtbegin.o的.init section 放到这里 </span></span><br><span class="line"><span class="comment">     *   调用全局构造函数</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">.section .fini</span><br><span class="line">.global _fini</span><br><span class="line">_fini:</span><br><span class="line">    <span class="comment">/* 下边两行也是保存ebp和esp，这是为了保存整个栈的内容 */</span></span><br><span class="line">    push %ebp</span><br><span class="line">    mov %esp, %ebp</span><br><span class="line">    <span class="comment">/** GCC将把crtbegin.o的.fini section 放到这里</span></span><br><span class="line"><span class="comment">     *  调用全局析构函数</span></span><br><span class="line"><span class="comment">     */</span></span><br></pre></td></tr></table></figure></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">.section .init</span><br><span class="line">    /** GCC将把crtend.o的.init section 放到这里</span><br><span class="line">     *  调用全局构造函数</span><br><span class="line">     */</span><br><span class="line">    /* 恢复原来栈的内容 */</span><br><span class="line">    pop %ebp</span><br><span class="line">    ret</span><br><span class="line"></span><br><span class="line">.section .fini</span><br><span class="line">    /** GCC将把crtend.o的.fini section 放到这里</span><br><span class="line">     *  调用全局析构函数</span><br><span class="line">     */</span><br><span class="line">    /* 同样是是恢复原来栈的内容 */</span><br><span class="line">    pop %ebp</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>
@@ -890,7 +902,7 @@
       <i class="fa fa-coffee"></i>
     </span>
     
-    <span title="站点阅读时长">3:58</span>
+    <span title="站点阅读时长">3:56</span>
   
 </div>
 
