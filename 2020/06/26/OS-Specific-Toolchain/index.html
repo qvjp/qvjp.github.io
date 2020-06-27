@@ -113,7 +113,7 @@
 <meta property="og:site_name" content="INLOW开发博客">
 <meta property="og:description" content="这篇将一起创建一个包含GCC和Binutils的OS专用工具链">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-06-27T14:06:45.935Z">
+<meta property="og:updated_time" content="2020-06-27T15:02:10.585Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="OS-Specific-Toolchain">
 <meta name="twitter:description" content="这篇将一起创建一个包含GCC和Binutils的OS专用工具链">
@@ -401,7 +401,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-06-27 22:06:45" itemprop="dateModified" datetime="2020-06-27T22:06:45+08:00">2020-06-27</time>
+                <time title="修改时间：2020-06-27 23:02:10" itemprop="dateModified" datetime="2020-06-27T23:02:10+08:00">2020-06-27</time>
               
             
           </span>
@@ -562,7 +562,7 @@
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir build &amp;&amp; <span class="built_in">cd</span> build</span><br><span class="line">../configure --target=i686-inwox --prefix=<span class="string">"<span class="variable">$HOME</span>/inwox-toolchain"</span> --with-sysroot=<span class="string">"/root/Programming/INWOX/sysroot"</span> --<span class="built_in">enable</span>-language=c,c++ --<span class="built_in">disable</span>-nls</span><br><span class="line">make -j<span class="string">"<span class="variable">$CPU_CORE</span>"</span> all-gcc all-target-libgcc</span><br><span class="line">make install-gcc install-target-libgcc</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<p>这篇文章较为简单，主要是工具链的升级，具体操作可以参考这恶鬼<a href="https://github.com/qvjp/INWOX/commit/8ea472b5cc4de0292a6cbd3b86ec1cf446e3819d" target="_blank" rel="noopener">Commit</a></p>
+<p>这篇文章较为简单，主要是工具链的升级，具体操作可以参考这个<a href="https://github.com/qvjp/INWOX/commit/8ea472b5cc4de0292a6cbd3b86ec1cf446e3819d" target="_blank" rel="noopener">Commit</a></p>
 <h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://wiki.osdev.org/Creating_a_C_Library" target="_blank" rel="noopener">Creating a C Library</a><br><a href="https://wiki.osdev.org/OS_Specific_Toolchain" target="_blank" rel="noopener">OS Specific Toolchain</a><br><a href="https://wiki.osdev.org/Hosted_GCC_Cross-Compiler" target="_blank" rel="noopener">Hosted GCC Cross-Compiler</a></p>
 
       
