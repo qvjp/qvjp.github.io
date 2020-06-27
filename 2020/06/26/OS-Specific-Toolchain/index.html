@@ -105,25 +105,25 @@
 
 
 
-  <meta name="description" content="这篇文章介绍全局构造函数（Global Constructors）是怎么回事，并实现一个简单的全局构造函数。">
-<meta name="keywords" content="INIT">
+  <meta name="description" content="这篇将一起创建一个包含GCC和Binutils的OS专用工具链">
+<meta name="keywords" content="GCC,Cross-Compiler">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Calling-Global-Constructors">
-<meta property="og:url" content="https://blog.inlow.online/2020/06/03/Calling-Global-Constructors/index.html">
+<meta property="og:title" content="OS-Specific-Toolchain">
+<meta property="og:url" content="https://blog.inlow.online/2020/06/26/OS-Specific-Toolchain/index.html">
 <meta property="og:site_name" content="INLOW开发博客">
-<meta property="og:description" content="这篇文章介绍全局构造函数（Global Constructors）是怎么回事，并实现一个简单的全局构造函数。">
+<meta property="og:description" content="这篇将一起创建一个包含GCC和Binutils的OS专用工具链">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-06-20T13:48:29.106Z">
+<meta property="og:updated_time" content="2020-06-27T14:06:45.935Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Calling-Global-Constructors">
-<meta name="twitter:description" content="这篇文章介绍全局构造函数（Global Constructors）是怎么回事，并实现一个简单的全局构造函数。">
+<meta name="twitter:title" content="OS-Specific-Toolchain">
+<meta name="twitter:description" content="这篇将一起创建一个包含GCC和Binutils的OS专用工具链">
 
 
 
 
 
 
-  <link rel="canonical" href="https://blog.inlow.online/2020/06/03/Calling-Global-Constructors/">
+  <link rel="canonical" href="https://blog.inlow.online/2020/06/26/OS-Specific-Toolchain/">
 
 
 
@@ -133,7 +133,7 @@
   };
 </script>
 
-  <title>Calling-Global-Constructors | INLOW开发博客</title>
+  <title>OS-Specific-Toolchain | INLOW开发博客</title>
   
 
 
@@ -341,7 +341,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.inlow.online/2020/06/03/Calling-Global-Constructors/">
+    <link itemprop="mainEntityOfPage" href="https://blog.inlow.online/2020/06/26/OS-Specific-Toolchain/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Qv Junping">
@@ -358,7 +358,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Calling-Global-Constructors
+          <h1 class="post-title" itemprop="name headline">OS-Specific-Toolchain
 
               
             
@@ -384,7 +384,7 @@
                 
               
 
-              <time title="创建时间：2020-06-03 21:14:45" itemprop="dateCreated datePublished" datetime="2020-06-03T21:14:45+08:00">2020-06-03</time>
+              <time title="创建时间：2020-06-26 20:53:18" itemprop="dateCreated datePublished" datetime="2020-06-26T20:53:18+08:00">2020-06-26</time>
             
 
             
@@ -401,7 +401,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-06-20 21:48:29" itemprop="dateModified" datetime="2020-06-20T21:48:29+08:00">2020-06-20</time>
+                <time title="修改时间：2020-06-27 22:06:45" itemprop="dateModified" datetime="2020-06-27T22:06:45+08:00">2020-06-27</time>
               
             
           </span>
@@ -418,14 +418,14 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/INLOW/" itemprop="url" rel="index"><span itemprop="name">INLOW</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/INWOX/" itemprop="url" rel="index"><span itemprop="name">INWOX</span></a></span>
 
                 
                 
                   ，
                 
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/INLOW/Develop/" itemprop="url" rel="index"><span itemprop="name">Develop</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/INWOX/Develop/" itemprop="url" rel="index"><span itemprop="name">Develop</span></a></span>
 
                 
                 
@@ -440,8 +440,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2020/06/03/Calling-Global-Constructors/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2020/06/03/Calling-Global-Constructors/" itemprop="commentCount"></span>
+                <a href="/2020/06/26/OS-Specific-Toolchain/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2020/06/26/OS-Specific-Toolchain/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -470,7 +470,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">2.7k</span>
+                <span title="本文字数">3.3k</span>
               
 
               
@@ -484,7 +484,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">7 分钟</span>
+                <span title="阅读时长">8 分钟</span>
               
             </div>
           
@@ -504,22 +504,66 @@
       
 
       
-        <p>这篇文章介绍全局构造函数（Global Constructors）是怎么回事，并实现一个简单的全局构造函数。<br><a id="more"></a></p>
-<p>全局构造函数就是在程序入口函数（_start）之前执行的函数，它负责解析命令行参数、初始化标准库、初始化内存、信号等等。运行全局初始化函数之后再运行<code>exit(main(argc, argv))</code>。下边表述的都是基于GCC编译器，其他编译器可能有其他表现。</p>
-<p>一般而言，全局构造函数/全局析构函数都被存储在一个函数指针数组里，调用这些函数就像是遍历数组并执行每个元素。但是编译器并不总是把这个列表的权限开放给使用者，这时候需要配合编译器，做一些适配来使用这个特性。</p>
-<h3 id="GCC-System-V-ABI"><a href="#GCC-System-V-ABI" class="headerlink" title="GCC - System V ABI"></a>GCC - System V ABI</h3><p>现在使用的编译器是<code>i686-elf-gcc</code>，它与其他比如<code>x86_64-elf-gcc</code>等都是实现了System V ABI，使用5个不同的结构来控制程序的初始化，分别为：<code>crt0.o</code>、<code>crti.o</code>、<code>crtbegin.o</code>、<code>crtend.o</code>和<code>crtn.o</code>，它们5个共同实现了两个函数：<code>_init</code>和<code>_fini</code>，分别用来进行全局初始化和全局析构。</p>
-<p>这种方案使得编译器可以很好的控制程序的初始化，但需要配合编译器做一些适配工作，所幸这很简单。编译器提供了上述5个文件中的两个：<code>crtbegin.o</code>和<code>crtend.o</code>，这两个文件包含编译器希望使用但是又希望隐藏细节的内部文件。要使用它们需要实现自己的<code>crti.o</code>和<code>crtn.o</code>。而<code>crt0.o</code>包含程序的入口点（通常是_start)，并调用另外4个文件实现的<code>_init</code>函数和<code>_fini</code>函数，在内核中，包含<code>_start</code>函数的文件就表示<code>crt0.o</code>。</p>
-<p>为了搞清楚到底是怎么回事，下边举个例子：</p>
-<p>下边程序由两个obj文件链接而成<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i686-elf-gcc foo.o bar.o -o program</span><br></pre></td></tr></table></figure></p>
-<p>GCC将重写上述命令为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i686-elf-ld crt0.o crti.o crtbegin.o foo.o bar.o crtend.o crtn.o</span><br></pre></td></tr></table></figure></p>
-<p>重写后的指令意思是要在链接期间将5个obj文件和用户自己的程序链接到一起，从而形成<code>_init</code>和<code>_fini</code>函数，这两个函数分别存储在<code>.ini</code>section和<code>.fini</code>section。这5个obj文件每个向这些section中贡献一部分内容，<code>crti.o</code>提供函数标头，<code>crtbegin.o</code>和<code>crtend.o</code>提供函数主体，<code>crtn.o</code>提供最后的return语句，这里要注意的是链接顺序，如果没有按此顺序链接可能会出现奇怪的问题。</p>
-<h3 id="在内核中使用crti-o-crtbegin-o-crtend-o-crtn-o"><a href="#在内核中使用crti-o-crtbegin-o-crtend-o-crtn-o" class="headerlink" title="在内核中使用crti.o crtbegin.o crtend.o crtn.o"></a>在内核中使用crti.o crtbegin.o crtend.o crtn.o</h3><p>在内核中没有用户态的libc库，你可能使用一个特殊的“libc”或者根本啥也没有。一般情况下，编译器都会提供<code>crtbegin.o</code>和<code>crtend.o</code>，但<code>crti.o</code>和<code>crtn.o</code>没有。内核应该自己提供所需要的<code>crti.o</code>和<code>crtn.o</code>（即使和用户态的完全相同）。当写好了自己的这两个文件后，需要和内核提供的两个一起链接到其他目标文件中，自己这两个文件的目录当然可以自己指定，但是内核提供的两个文件路径怎么获取呢？GCC提供了方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i686-elf-gcc $CFLAGS -print-file-name=crtbegin.o</span><br></pre></td></tr></table></figure></p>
-<p>可以通过这样的方式来获取<code>crtbegin.o</code>的绝对路径，同样也可以获取到<code>crtend.o</code>的路径，然后和自己的两个文件一起，连接到其他目标文件中。</p>
-<p>下边给出简单的<code>crti.s</code>和<code>crtn.s</code>的代码，仅供参考：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">.section .init</span><br><span class="line">.global _init</span><br><span class="line">_init:</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 下边两行是保存ebp(基址寄存器)和调用前的esp(栈顶地址)，即保存整个栈的内容</span></span><br><span class="line"><span class="comment">     * 方便调用后的恢复</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    push %ebp</span><br><span class="line">    mov %esp, %ebp</span><br><span class="line">    <span class="comment">/** GCC将把crtbegin.o的.init section 放到这里 </span></span><br><span class="line"><span class="comment">     *   调用全局构造函数</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">.section .fini</span><br><span class="line">.global _fini</span><br><span class="line">_fini:</span><br><span class="line">    <span class="comment">/* 下边两行也是保存ebp和esp，这是为了保存整个栈的内容 */</span></span><br><span class="line">    push %ebp</span><br><span class="line">    mov %esp, %ebp</span><br><span class="line">    <span class="comment">/** GCC将把crtbegin.o的.fini section 放到这里</span></span><br><span class="line"><span class="comment">     *  调用全局析构函数</span></span><br><span class="line"><span class="comment">     */</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">.section .init</span><br><span class="line">    /** GCC将把crtend.o的.init section 放到这里</span><br><span class="line">     *  调用全局构造函数</span><br><span class="line">     */</span><br><span class="line">    /* 恢复原来栈的内容 */</span><br><span class="line">    pop %ebp</span><br><span class="line">    ret</span><br><span class="line"></span><br><span class="line">.section .fini</span><br><span class="line">    /** GCC将把crtend.o的.fini section 放到这里</span><br><span class="line">     *  调用全局析构函数</span><br><span class="line">     */</span><br><span class="line">    /* 同样是是恢复原来栈的内容 */</span><br><span class="line">    pop %ebp</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>
-<p>Makefile如下：<br><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">OBJ := gdt.o \</span><br><span class="line">	kernel.o \</span><br><span class="line">	print.o</span><br><span class="line">OBJ += arch/i686/loader.o</span><br><span class="line"></span><br><span class="line">CRTBEGIN_0 := <span class="variable">$(<span class="built_in">shell</span> <span class="variable">$(CC)</span> <span class="variable">$(CXXFLAGS)</span> -print-<span class="built_in">file</span>-name=crtbegin.o)</span></span><br><span class="line">CRTEND_0 := <span class="variable">$(<span class="built_in">shell</span> <span class="variable">$(CC)</span> <span class="variable">$(CXXFLAGS)</span> -print-<span class="built_in">file</span>-name=crtend.o)</span></span><br><span class="line"></span><br><span class="line">START_OBJ := <span class="variable">$(BUILD)</span>/arch/i686/crti.o <span class="variable">$(CRTBEGIN_0)</span></span><br><span class="line">END_OBJ := <span class="variable">$(CRTEND_0)</span> <span class="variable">$(BUILD)</span>/arch/i686/crtn.o</span><br><span class="line"></span><br><span class="line">OBJ := <span class="variable">$(START_OBJ)</span> <span class="variable">$(<span class="built_in">addprefix</span> <span class="variable">$(BUILD)</span>/, <span class="variable">$(OBJ)</span>)</span> <span class="variable">$(END_OBJ)</span></span><br></pre></td></tr></table></figure></p>
-<p><code>loader.o</code>中包含了<code>_start</code>函数，也就是<code>crt0.o</code>，这样就完成了全局构造函数/析构函数所需的全部内容。</p>
-<p>现在内核拥有了<code>_init</code>和<code>_fini</code>，可以在<code>loader.o</code>中进行全局初始化了，可以在内核运行之前进行堆栈的初始化、日志或其他核心功能的初始化工作，之后再调用真正的内核入口函数。这和用户空间的逻辑基本一致，之后再来补充用户态的具体内容。</p>
+        <p>这篇将一起创建一个包含GCC和Binutils的OS专用工具链</p>
+<a id="more"></a>
+<p>之前的每一个编译，都是基于<a href="https://blog.inlow.online/2019/01/04/GCC-Cross-Compiler/">交叉编译器</a>，它是一个通用的编译器，好处是非常简单的就可以通过源码编译出来，一行代码也没改，坏处就是它太通用了，和INWOX一点关系都没，比如我要在代码中定义一个<code>__IS_INWOX__</code>宏来对本系统做以些特殊操作，而在其他系统可能操作方式不同，通用的交叉编译器不认识这个宏，也就没法这么写，或者说在链接Libc时，我想使用特殊的<code>crt*.o</code>文件，都是很难办到的，这时候就需要一个专门为本系统定制的编译器，使用它可以直接编译出可以在本系统运行的应用程序，而不需要添加奇怪的命令行参数，这也为将来移植现有应用提供了基础。</p>
+<p>这个博客将一步步记录如何对GCC和Binutils进行修改来满足INWOX的最基本要求。将来最后的目标是可以在INWOX上开发INWOX，用INWOX的编译器来编译INWOX，<sub>最近比较流行的套娃？😁</sub></p>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>需要的原料</p>
+<ol>
+<li>可以构建GCC的环境，也就是之前搭建交叉编译器的环境</li>
+<li>autoconf</li>
+<li>automake</li>
+<li>libtool</li>
+<li>Binutils和GCC的最新源码</li>
+<li>Binutils和GCC所需要的依赖（可以参考<a href="https://blog.inlow.online/2019/01/04/GCC-Cross-Compiler/">交叉编译器</a>）</li>
+<li>Libc，编译OS专用编译器需要告诉GCC和Binutils我们有一个Libc，在当前阶段可能不一定要实现出来，但声明是要有的</li>
+</ol>
+<h3 id="修改Binutils"><a href="#修改Binutils" class="headerlink" title="修改Binutils"></a>修改Binutils</h3><ul>
+<li>config.sub</li>
+<li>bfd/config.bfd</li>
+<li>gas/Makefile.am</li>
+<li>gas/config/tc-i386.c</li>
+<li>gas/config/te-inwox.h</li>
+<li>gas/configure.tgt</li>
+<li>ld/Makefile.am</li>
+<li>ld/Makefile.in</li>
+<li>ld/aclocal.m4</li>
+<li>ld/configure.tgt</li>
+<li>ld/emulparams/elf_i386_inwox.sh</li>
+<li>ld/emulparams/elf_x86_64_inwox.sh</li>
+</ul>
+<p>具体参见<a href="https://github.com/qvjp/binutils-2.34-inwox/commit/ebb85362145f3e7b8771a4ef836a96ee3111d6c0" target="_blank" rel="noopener">Add INWOX Target</a></p>
+<h3 id="修改GCC"><a href="#修改GCC" class="headerlink" title="修改GCC"></a>修改GCC</h3><ul>
+<li>config.sub</li>
+<li>gcc/config.gcc</li>
+<li>gcc/config/inwox.h</li>
+<li>libgcc/config.host</li>
+</ul>
+<p>具体参见<a href="https://github.com/qvjp/gcc-10.1.0-inwox/commit/7dfaf5d7aa58787437c299dfad1dd38cf604b6ed" target="_blank" rel="noopener">Add INWOX Target</a></p>
+<h3 id="准备libc"><a href="#准备libc" class="headerlink" title="准备libc"></a>准备libc</h3><h4 id="必要头文件"><a href="#必要头文件" class="headerlink" title="必要头文件"></a>必要头文件</h4><p>编译专用的工具链需要指明该系统使用到的libc，尤其是特殊的几个文件和其中的函数，分别是：</p>
+<ul>
+<li>sys/types.h: pid_t.</li>
+<li>errno.h: 空文件即可</li>
+<li>stdlib.h: abort()，free()，malloc()，atexit()，atoi()，getenv()</li>
+<li>stdio.h: FILE，stderr，fflush()，fprintf()，size_t，SEEK_SET，fclose()，fopen()，fread()，fseek()，ftell()，fwrite()，setbuf()，vfprintf()</li>
+<li>string.h: size_t，memcpy，memset()，strlen()，strcpy()</li>
+<li>time.h: 空文件即可</li>
+<li>unistd.h: pid_t，fork()，execv()，execve()，execvp()</li>
+<li>stdint.h</li>
+</ul>
+<h4 id="初始化程序"><a href="#初始化程序" class="headerlink" title="初始化程序"></a>初始化程序</h4><p>最重要的是在libc中实现<code>_start</code>函数，通过它来控制程序的加载等初始化任务。之前在<a href="https://blog.inlow.online/2020/06/03/Calling-Global-Constructors/">Calling-Global-Constructors</a>说过一部分，主要就是通过几个目标文件，来实现初始化功能，一般来说是类似于<code>exit(main(argc,argv))</code>这种形式来加载用户态程序的main函数，然后再GCC的源码目录添加本系统的初始化方法文件<code>gcc/config/inwox.h</code>来指明如何使用那几个目标文件。</p>
+<p>之前说过，总共需要5个分别为<code>crt0.o</code>、<code>crti.o</code>、<code>crtbegin.o</code>、<code>crtend.o</code>和<code>crtn.o</code>的文件，<code>crtbegin.o</code>和<code>crtend.o</code>在GCC中都会提供，而<code>crtilo</code>和<code>crtn.o</code>在之前文章也实现过了，所以这里仅需要再实现一个<code>crt0.o</code>即可，这个文件主要是定义<code>_start</code>函数，然后处理参数、环境变量，调用<code>init</code>方法，然后就是调用用户态的<code>main</code>函数，最终调用退出方法。代码可参考下边：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.global _start</span><br><span class="line">.type _start, @function</span><br><span class="line">_start:</span><br><span class="line">    push $<span class="number">0</span></span><br><span class="line">    push $<span class="number">0</span></span><br><span class="line">    mov %esp, %ebp</span><br><span class="line"></span><br><span class="line">    sub $<span class="number">12</span>, %esp</span><br><span class="line">    push %ecx <span class="meta"># envp</span></span><br><span class="line">    push %ebx <span class="meta"># argv</span></span><br><span class="line">    push %eax <span class="meta"># argc</span></span><br><span class="line"></span><br><span class="line">    call _init</span><br><span class="line"></span><br><span class="line">    call main</span><br><span class="line"></span><br><span class="line">    add $<span class="number">4</span>, %esp</span><br><span class="line">    push %eax</span><br><span class="line">    call <span class="built_in">exit</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">.size _start, . - _start</span><br></pre></td></tr></table></figure></p>
+<h3 id="提供sysroot头文件"><a href="#提供sysroot头文件" class="headerlink" title="提供sysroot头文件"></a>提供sysroot头文件</h3><p>在之前的通用交叉编译工具链搭建的过程中，使用了<code>--without-headers</code>参数，表明没有标准库，没有头文件，现在有了头文件，所以要使用<code>--with-sysroot</code>来把libc和GCC关联起来，以实现如用户态程序的编译，用户态程序使用系统调用等特性。例如现在INWOX的sysroot如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">sysroot</span><br><span class="line">`-- usr</span><br><span class="line">    |-- include</span><br><span class="line">    |   |-- assert.h</span><br><span class="line">    |   |-- errno.h</span><br><span class="line">    |   |-- inwox</span><br><span class="line">    |   |   |-- kernel</span><br><span class="line">    |   |   |   |-- ....h(省略部分头文件)</span><br><span class="line">    |   |   |-- syscall.h</span><br><span class="line">    |   |   `-- types.h</span><br><span class="line">    |   |-- ....(省略部分头文件)</span><br><span class="line">    |   |-- sys</span><br><span class="line">    |   |   |-- syscall.h</span><br><span class="line">    |   |   `-- types.h</span><br><span class="line">    |   |-- time.h</span><br><span class="line">    |   `-- unistd.h</span><br><span class="line">    `-- lib</span><br><span class="line">        |-- crt0.o</span><br><span class="line">        |-- crti.o</span><br><span class="line">        |-- crtn.o</span><br><span class="line">        |-- libc.a</span><br><span class="line">        `-- libk.a</span><br></pre></td></tr></table></figure></p>
+<h3 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h3><ul>
+<li><p>Binutils</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir build &amp;&amp; <span class="built_in">cd</span> build</span><br><span class="line">../configure --target=i686-inwox --prefix=<span class="string">"<span class="variable">$HOME</span>/inwox-toolchain"</span> --with-sysroot=<span class="string">"/root/Programming/INWOX/sysroot"</span> --<span class="built_in">disable</span>-werror --<span class="built_in">disable</span>-nls</span><br><span class="line">make -j<span class="string">"<span class="variable">$CPU_CORE</span>"</span></span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>GCC</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir build &amp;&amp; <span class="built_in">cd</span> build</span><br><span class="line">../configure --target=i686-inwox --prefix=<span class="string">"<span class="variable">$HOME</span>/inwox-toolchain"</span> --with-sysroot=<span class="string">"/root/Programming/INWOX/sysroot"</span> --<span class="built_in">enable</span>-language=c,c++ --<span class="built_in">disable</span>-nls</span><br><span class="line">make -j<span class="string">"<span class="variable">$CPU_CORE</span>"</span> all-gcc all-target-libgcc</span><br><span class="line">make install-gcc install-target-libgcc</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>这篇文章较为简单，主要是工具链的升级，具体操作可以参考这恶鬼<a href="https://github.com/qvjp/INWOX/commit/8ea472b5cc4de0292a6cbd3b86ec1cf446e3819d" target="_blank" rel="noopener">Commit</a></p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://wiki.osdev.org/Creating_a_C_Library" target="_blank" rel="noopener">Creating a C Library</a><br><a href="https://wiki.osdev.org/OS_Specific_Toolchain" target="_blank" rel="noopener">OS Specific Toolchain</a><br><a href="https://wiki.osdev.org/Hosted_GCC_Cross-Compiler" target="_blank" rel="noopener">Hosted GCC Cross-Compiler</a></p>
 
       
     </div>
@@ -543,7 +587,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/INIT/" rel="tag"># INIT</a>
+            <a href="/tags/GCC/" rel="tag"># GCC</a>
+          
+            <a href="/tags/Cross-Compiler/" rel="tag"># Cross-Compiler</a>
           
         </div>
       
@@ -576,8 +622,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/04/06/ptmalloc/" rel="next" title="ptmalloc">
-                <i class="fa fa-chevron-left"></i> ptmalloc
+              <a href="/2020/06/25/Libc-Startup-Termination/" rel="next" title="Libc-Startup-Termination">
+                <i class="fa fa-chevron-left"></i> Libc-Startup-Termination
               </a>
             
           </div>
@@ -585,10 +631,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/06/21/Loading-ELF/" rel="prev" title="Loading ELF">
-                Loading ELF <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -845,7 +887,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#GCC-System-V-ABI"><span class="nav-number">1.</span> <span class="nav-text">GCC - System V ABI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在内核中使用crti-o-crtbegin-o-crtend-o-crtn-o"><span class="nav-number">2.</span> <span class="nav-text">在内核中使用crti.o crtbegin.o crtend.o crtn.o</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改Binutils"><span class="nav-number">2.</span> <span class="nav-text">修改Binutils</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改GCC"><span class="nav-number">3.</span> <span class="nav-text">修改GCC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#准备libc"><span class="nav-number">4.</span> <span class="nav-text">准备libc</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#必要头文件"><span class="nav-number">4.1.</span> <span class="nav-text">必要头文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#初始化程序"><span class="nav-number">4.2.</span> <span class="nav-text">初始化程序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提供sysroot头文件"><span class="nav-number">5.</span> <span class="nav-text">提供sysroot头文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译"><span class="nav-number">6.</span> <span class="nav-text">编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
