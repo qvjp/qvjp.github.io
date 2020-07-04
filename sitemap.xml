@@ -4,7 +4,7 @@
   <url>
     <loc>https://blog.inlow.online/2019/03/10/Syscall/</loc>
     
-    <lastmod>2020-07-04T17:26:56.547Z</lastmod>
+    <lastmod>2020-07-04T17:31:34.679Z</lastmod>
     
   </url>
   
@@ -72,14 +72,7 @@
   </url>
   
   <url>
-    <loc>https://blog.inlow.online/2019/03/07/Multitasking-System/</loc>
-    
-    <lastmod>2020-06-20T13:48:29.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://blog.inlow.online/2019/01/12/Function-pointer/</loc>
+    <loc>https://blog.inlow.online/2020/06/03/Calling-Global-Constructors/</loc>
     
     <lastmod>2020-06-20T13:48:29.000Z</lastmod>
     
@@ -100,14 +93,7 @@
   </url>
   
   <url>
-    <loc>https://blog.inlow.online/2019/01/08/Printf/</loc>
-    
-    <lastmod>2020-06-20T13:48:29.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://blog.inlow.online/2019/02/27/Malloc-and-Free/</loc>
+    <loc>https://blog.inlow.online/2019/03/08/Getting-to-Ring3/</loc>
     
     <lastmod>2020-06-20T13:48:29.000Z</lastmod>
     
@@ -121,14 +107,28 @@
   </url>
   
   <url>
-    <loc>https://blog.inlow.online/2019/03/08/Getting-to-Ring3/</loc>
+    <loc>https://blog.inlow.online/2019/03/07/Multitasking-System/</loc>
     
     <lastmod>2020-06-20T13:48:29.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://blog.inlow.online/2020/06/03/Calling-Global-Constructors/</loc>
+    <loc>https://blog.inlow.online/2019/01/12/Function-pointer/</loc>
+    
+    <lastmod>2020-06-20T13:48:29.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.inlow.online/2019/02/27/Malloc-and-Free/</loc>
+    
+    <lastmod>2020-06-20T13:48:29.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.inlow.online/2019/01/08/Printf/</loc>
     
     <lastmod>2020-06-20T13:48:29.000Z</lastmod>
     
@@ -142,7 +142,14 @@
   </url>
   
   <url>
-    <loc>https://blog.inlow.online/2019/03/04/Well-Done-Linux-Kernel-5-0/</loc>
+    <loc>https://blog.inlow.online/2019/01/05/What-is-the-difference-eq-in-makefile/</loc>
+    
+    <lastmod>2020-05-27T15:22:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.inlow.online/about/index.html</loc>
     
     <lastmod>2020-05-27T15:22:16.000Z</lastmod>
     
@@ -156,14 +163,7 @@
   </url>
   
   <url>
-    <loc>https://blog.inlow.online/2019/01/05/What-is-the-difference-eq-in-makefile/</loc>
-    
-    <lastmod>2020-05-27T15:22:16.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://blog.inlow.online/about/index.html</loc>
+    <loc>https://blog.inlow.online/2019/03/04/Well-Done-Linux-Kernel-5-0/</loc>
     
     <lastmod>2020-05-27T15:22:16.000Z</lastmod>
     
