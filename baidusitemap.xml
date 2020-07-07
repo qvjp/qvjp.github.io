@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://blog.inlow.online/2020/07/06/Printf-2/</loc>
+    <lastmod>2020-07-07</lastmod>
+  </url>  <url>
     <loc>https://blog.inlow.online/2019/03/10/Syscall/</loc>
     <lastmod>2020-07-04</lastmod>
   </url>  <url>
@@ -25,40 +28,40 @@
     <loc>https://blog.inlow.online/2019/01/10/GDT/</loc>
     <lastmod>2020-06-20</lastmod>
   </url>  <url>
-    <loc>https://blog.inlow.online/2020/06/03/Calling-Global-Constructors/</loc>
+    <loc>https://blog.inlow.online/2019/01/12/Function-pointer/</loc>
     <lastmod>2020-06-20</lastmod>
   </url>  <url>
-    <loc>https://blog.inlow.online/2019/02/18/Debug-INLOW/</loc>
+    <loc>https://blog.inlow.online/2020/06/03/Calling-Global-Constructors/</loc>
     <lastmod>2020-06-20</lastmod>
   </url>  <url>
     <loc>https://blog.inlow.online/2019/01/05/Hello-World/</loc>
     <lastmod>2020-06-20</lastmod>
   </url>  <url>
-    <loc>https://blog.inlow.online/2019/03/08/Getting-to-Ring3/</loc>
+    <loc>https://blog.inlow.online/2019/01/04/GCC-Cross-Compiler/</loc>
     <lastmod>2020-06-20</lastmod>
   </url>  <url>
-    <loc>https://blog.inlow.online/2019/01/04/GCC-Cross-Compiler/</loc>
+    <loc>https://blog.inlow.online/2019/03/08/Getting-to-Ring3/</loc>
     <lastmod>2020-06-20</lastmod>
   </url>  <url>
     <loc>https://blog.inlow.online/2019/03/07/Multitasking-System/</loc>
     <lastmod>2020-06-20</lastmod>
   </url>  <url>
-    <loc>https://blog.inlow.online/2019/01/12/Function-pointer/</loc>
+    <loc>https://blog.inlow.online/2019/01/08/Printf/</loc>
+    <lastmod>2020-06-20</lastmod>
+  </url>  <url>
+    <loc>https://blog.inlow.online/2019/02/18/Debug-INLOW/</loc>
     <lastmod>2020-06-20</lastmod>
   </url>  <url>
     <loc>https://blog.inlow.online/2019/02/27/Malloc-and-Free/</loc>
     <lastmod>2020-06-20</lastmod>
   </url>  <url>
-    <loc>https://blog.inlow.online/2019/01/08/Printf/</loc>
-    <lastmod>2020-06-20</lastmod>
-  </url>  <url>
     <loc>https://blog.inlow.online/2020/04/06/ptmalloc/</loc>
     <lastmod>2020-06-05</lastmod>
   </url>  <url>
-    <loc>https://blog.inlow.online/2019/01/05/What-is-the-difference-eq-in-makefile/</loc>
+    <loc>https://blog.inlow.online/2019/01/04/What-is-INLOW/</loc>
     <lastmod>2020-05-27</lastmod>
   </url>  <url>
-    <loc>https://blog.inlow.online/2019/01/04/What-is-INLOW/</loc>
+    <loc>https://blog.inlow.online/2019/01/05/What-is-the-difference-eq-in-makefile/</loc>
     <lastmod>2020-05-27</lastmod>
   </url>  <url>
     <loc>https://blog.inlow.online/2019/03/04/Well-Done-Linux-Kernel-5-0/</loc>

@@ -105,27 +105,25 @@
 
 
 
-  <meta name="description" content="说实话在上一篇开启分页中，开发时遇到不少问题，说来惭愧，我对汇编不太熟悉，好在可以调试，好多问题可以迎刃而解。">
-<meta name="keywords" content="Debug,GDB,QEMU">
+  <meta name="description" content="这篇博客算是之前文章的一个补充，详细介绍一下printf，这次是一个比较完善完整的类Unix实现。">
+<meta name="keywords" content="Printf,VGA">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Debug INLOW">
-<meta property="og:url" content="https://blog.inlow.online/2019/02/18/Debug-INLOW/index.html">
+<meta property="og:title" content="Printf-2">
+<meta property="og:url" content="https://blog.inlow.online/2020/07/06/Printf-2/index.html">
 <meta property="og:site_name" content="INLOW开发博客">
-<meta property="og:description" content="说实话在上一篇开启分页中，开发时遇到不少问题，说来惭愧，我对汇编不太熟悉，好在可以调试，好多问题可以迎刃而解。">
+<meta property="og:description" content="这篇博客算是之前文章的一个补充，详细介绍一下printf，这次是一个比较完善完整的类Unix实现。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://inlow.xiaojumao.club/image/png/gdb-tui.png">
-<meta property="og:updated_time" content="2020-06-20T13:48:29.000Z">
+<meta property="og:updated_time" content="2020-07-07T17:10:07.936Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Debug INLOW">
-<meta name="twitter:description" content="说实话在上一篇开启分页中，开发时遇到不少问题，说来惭愧，我对汇编不太熟悉，好在可以调试，好多问题可以迎刃而解。">
-<meta name="twitter:image" content="https://inlow.xiaojumao.club/image/png/gdb-tui.png">
+<meta name="twitter:title" content="Printf-2">
+<meta name="twitter:description" content="这篇博客算是之前文章的一个补充，详细介绍一下printf，这次是一个比较完善完整的类Unix实现。">
 
 
 
 
 
 
-  <link rel="canonical" href="https://blog.inlow.online/2019/02/18/Debug-INLOW/">
+  <link rel="canonical" href="https://blog.inlow.online/2020/07/06/Printf-2/">
 
 
 
@@ -135,7 +133,7 @@
   };
 </script>
 
-  <title>Debug INLOW | INLOW开发博客</title>
+  <title>Printf-2 | INLOW开发博客</title>
   
 
 
@@ -343,7 +341,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.inlow.online/2019/02/18/Debug-INLOW/">
+    <link itemprop="mainEntityOfPage" href="https://blog.inlow.online/2020/07/06/Printf-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Qv Junping">
@@ -360,7 +358,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Debug INLOW
+          <h1 class="post-title" itemprop="name headline">Printf-2
 
               
             
@@ -386,7 +384,7 @@
                 
               
 
-              <time title="创建时间：2019-02-18 10:28:23" itemprop="dateCreated datePublished" datetime="2019-02-18T10:28:23+08:00">2019-02-18</time>
+              <time title="创建时间：2020-07-06 23:31:52" itemprop="dateCreated datePublished" datetime="2020-07-06T23:31:52+08:00">2020-07-06</time>
             
 
             
@@ -403,7 +401,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-06-20 21:48:29" itemprop="dateModified" datetime="2020-06-20T21:48:29+08:00">2020-06-20</time>
+                <time title="修改时间：2020-07-08 01:10:07" itemprop="dateModified" datetime="2020-07-08T01:10:07+08:00">2020-07-08</time>
               
             
           </span>
@@ -427,7 +425,7 @@
                   ，
                 
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/INLOW/Other/" itemprop="url" rel="index"><span itemprop="name">Other</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/INLOW/Develop/" itemprop="url" rel="index"><span itemprop="name">Develop</span></a></span>
 
                 
                 
@@ -442,8 +440,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2019/02/18/Debug-INLOW/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/02/18/Debug-INLOW/" itemprop="commentCount"></span>
+                <a href="/2020/07/06/Printf-2/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2020/07/06/Printf-2/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -472,7 +470,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">3.3k</span>
+                <span title="本文字数">4.2k</span>
               
 
               
@@ -486,7 +484,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">8 分钟</span>
+                <span title="阅读时长">10 分钟</span>
               
             </div>
           
@@ -506,90 +504,123 @@
       
 
       
-        <p>说实话在上一篇<a href="https://blog.inlow.online/2019/01/21/Paging/">开启分页</a>中，开发时遇到不少问题，说来惭愧，我对汇编不太熟悉，好在可以调试，好多问题可以迎刃而解。<br><a id="more"></a></p>
-<h3 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h3><ul>
-<li>qemu</li>
-<li>gdb</li>
-<li>objcopy</li>
-</ul>
-<h3 id="调试过程"><a href="#调试过程" class="headerlink" title="调试过程"></a>调试过程</h3><p>调试内核其实和平时调试应用程序没有什么太大区别，就是平时那一套。我选用的是比较简单的qemu+gdb进行调试。<br>qemu支持gdb的远程调试，只要在开始运行时加上<code>-s</code>参数便可在TCP的1234端口监听来自gdb的调试，当然可以自定义端口，比如使用1212端口<code>-gdb tcp::1212</code>。另外使用参数<code>-S</code>可以在启动后暂停CPU，等待调试。比如我在Makefile中加入了这一句：<br><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">qemu-dbg: <span class="variable">$(ISO)</span></span></span><br><span class="line">	qemu-system-i386 -cdrom <span class="variable">$^</span> -S -s</span><br></pre></td></tr></table></figure></p>
-<p>这将启动qemu去监听来自1234端口的gdb的连接。</p>
-<p>使用gdb调试需要在编译时将调试信息加入到生成文件中，使用gcc的-g参数。然后需要把调试信息和生成的内核文件分离开，这里使用的是GNU Binutils包中的objcopy工具。在分离出调试信息后，可以将调试信息从内核文件中剔除，以减小内核大小，这里还是使用objcopy。这个过程我也写到了Makefile中：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">objcopy --only-keep-debug $(BUILD_DIR)/$(ARCH)/kernel/kernel.elf $(BUILD_DIR)/kernel.sym</span><br><span class="line">objcopy --strip-debug $(BUILD_DIR)/$(ARCH)/kernel/kernel.elf</span><br></pre></td></tr></table></figure></p>
-<p>然后就可以开始调试了，启动gdb：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gdb</span><br><span class="line">(gdb)</span><br></pre></td></tr></table></figure></p>
-<p>连接到qemu的1234端口，如果不在本机，localhost也可以使用IP或URL来代替：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(gdb) target remote localhost:1234</span><br></pre></td></tr></table></figure></p>
-<p>然后导入调试的符号文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(gdb) symbol-file build/kernel.sym</span><br></pre></td></tr></table></figure></p>
-<p>到这里，可以开始快乐的调试啦，常用的gdb调试技巧就可以使用了。</p>
-<h3 id="GDB常用命令"><a href="#GDB常用命令" class="headerlink" title="GDB常用命令"></a>GDB常用命令</h3><p>下边我总结一下GDB调试常用的命令：</p>
-<h4 id="断点"><a href="#断点" class="headerlink" title="断点"></a>断点</h4><ul>
-<li>[b]reak &lt;函数名或文件名：行号或内存地址><br>在某个函数、某行或一个特定的一个地址出下断点。</li>
-<li>[d]elete &lt;断点号><br>删除某个断点。可以使用info break或者 i b来查看断点号。</li>
-<li>[clear]<br>删除所有断点。</li>
-<li>[enable] &lt;断点号&gt;<br>使某个断点生效。</li>
-<li>[disable] &lt;断点号&gt;<br>使某个断点失效。</li>
-</ul>
-<h4 id="WatchPoint"><a href="#WatchPoint" class="headerlink" title="WatchPoint"></a>WatchPoint</h4><ul>
-<li><p>[watch] &lt;表达式><br>设置一个新的watch point，如果调试的时候此位置发生改变将会显示，如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(gdb) n</span><br><span class="line"></span><br><span class="line">Hardware watchpoint 2: *format</span><br><span class="line"></span><br><span class="line">Old value = 76 &apos;L&apos;</span><br><span class="line">New value = 79 &apos;O&apos;</span><br><span class="line">Print::printf (format=0xc01054ec &quot;O WORLD!\n&quot;) at src/print.cpp:65</span><br><span class="line">65	    while (*format)</span><br></pre></td></tr></table></figure>
+        <p>这篇博客算是<a href="https://blog.inlow.online/2019/01/08/Printf/">之前文章</a>的一个补充，详细介绍一下<code>printf</code>，这次是一个比较完善完整的类Unix实现。</p>
+<a id="more"></a>
+<p><code>printf()</code>，格式化输出字符串到stdout，看似简单，实则挺麻烦的一个函数。首先先了解一下Posix规定的<code>printf()</code>的全部功能，然后再看具体实现的算法。</p>
+<h3 id="是什么"><a href="#是什么" class="headerlink" title="是什么"></a>是什么</h3><p>Posix规定了<code>printf()</code>诸多功能，太基础的基本概念这篇就不说了，从格式化说起。</p>
+<p>Posix中描述了五个<code>printf</code>族函数，分别是<code>dprintf</code>，<code>fprintf</code>，<code>printf</code>，<code>snprintf</code>，<code>sprintf</code>，其中<code>dprintf</code>是对标准的扩展，在多数系统中都有实现，INWOX也不例外。</p>
+<p><code>printf</code>将输出内容放到标准输出流stdout上，<code>fprintf</code>将输出内容放到给定命名的输出流上，<code>sprintf</code>将输出内容放到给定地址然后在最后加上’\0’，调用者要确保给定地址的大小足够，<code>snprintf</code>和<code>sprintf</code>功能一致，只是限制了内容大小，而<code>dprintf</code>则是将内容输出到文件，与<code>fprintf</code>不同的是，此函数第一个参数是文件描述符而不是FILE指针。</p>
+<p>话不多说，直接看格式</p>
+<h4 id="格式字符串"><a href="#格式字符串" class="headerlink" title="格式字符串"></a>格式字符串</h4><p><code>%[parameter][flags][width][.precision][length]type</code><br>格式字符串由0个或多个指令组成：普通字符（不是%）原样复制到输出流，或conversion specifications（以%开头），每个conversion specifications都会获取0个或多个后续的参数，然后以conversion specifier结尾，在这中间有三个可选的标志，分别为：最小字段宽度、精度、长度。</p>
+<ul>
+<li><p>parameter</p>
+<ol>
+<li><code>n$</code>，<code>n</code>是数字，表示第n个参数，这使得一个参数可以输出多次，如果任意一个占位符使用了parameter，那么其他占位符都需要使用，这是posix扩展，不是ISO C标准<blockquote>
+<p>例子</p>
+<p><code>printf(&quot;%3$d %3$#X, %1$d %1$#X, %2$d %2$#X&quot;, 1, 10, 100);</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; 100 0X64, 1 0X1, 10 0XA</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
 </li>
-<li><p>delete/enable/disable &lt;WatchPoint号><br>同断点</p>
+</ol>
+</li>
+<li><p>flags，可以为0个或多个一下标识：</p>
+<ol>
+<li><p><code>+</code>，总是表示有符号数值的’+’或’-‘号，缺省情况是忽略正数的符号。仅适用于数值类型。</p>
+<blockquote>
+<p>例子</p>
+<p><code>printf(&quot;%+d %+d %d %d\n&quot;, 10, -10, 10, -10);</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; +10 -10 10 -10</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p><code>-</code>，左对齐。缺省情况是右对齐。</p>
+<blockquote>
+<p>例子</p>
+<p><code>printf(&quot;|%-20d|%20d|\n&quot;, 100, 100);</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; |100                 |                 100|</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p><code>space</code>，使有符号数的输出如果没有正负号或者输出0个字符，则前缀1个空格。如果空格与’+’同时出现，则空格说明符被忽略。</p>
+<blockquote>
+<p>例子</p>
+<p><code>printf(&quot;|% d|%d|\n&quot;, 10, 10);</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; | 10|10|</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p><code>#</code>，对于’g’与’G’，不删除尾部0以表示精度。对于’f’, ‘F’, ‘e’, ‘E’, ‘g’, ‘G’, 总是输出小数点。对于’o’, ‘x’, ‘X’, 在非0数值前分别输出前缀0, 0x, 0X表示数制。</p>
+<blockquote>
+<p>例子</p>
+<p><code>printf(&quot;%#G %G\n&quot;, 1.0, 1.0);</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; 1.00000 1</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><code>printf(&quot;%#x %x\n&quot;, 10, 10);</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; 0xa a</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p><code>0</code>，如果width选项前缀以0，则在左侧用0填充直至达到宽度要求，如果0与-均出现，则0被忽略，即左对齐依然用空格填充。</p>
+<blockquote>
+<p>例子</p>
+<p><code>printf(&quot;|%020d|%20d|\n&quot;, 1, 1);</code></p>
+<p><code>printf(&quot;|%020d|%20d|\n&quot;, -1, -1);</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; |00000000000000000001|                   1|</span><br><span class="line">&gt;</span><br><span class="line">&gt; |-0000000000000000001|                  -1|</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+</ol>
+</li>
+<li><p>width，可以直接给定也可以忽略，或者使用<code>*</code>指定参数的值</p>
+<p>  给出显示数值的最小宽度，实际输出字符的个数不足域宽，则根据左对齐或右对齐进行填充。实际输出字符的个数超过域宽并不引起数值截断，而是显示全部。宽度值的前导0被解释为0填充标志。如果域宽值为*，则由对应的函数参数的值为当前域宽</p>
+<blockquote>
+<p>例子</p>
+<p><code>printf(&quot;|%20d|%d|\n&quot;, 10, 10);</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; |                  10|10|</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>precision，可以直接给定也可以忽略，或者使用<code>*</code>指定参数的值</p>
+<p>  通常指明输出的最大长度，依赖于特定的格式化类型</p>
+<ol>
+<li>d、i、u、x、o的整型数值，是指最小数字位数，不足的位要在左侧补0，如果超过也不截断，缺省值为1</li>
+<li>a,A,e,E,f,F的浮点数值，指小数点右边显示的数字位数，必要时四舍五入或补0；缺省值为6</li>
+<li>对于g,G的浮点数值，指有效数字的最大位数；缺省值为6</li>
+<li>对于s的字符串类型，是指输出的字节的上限，超出限制的其它字符将被截断</li>
+<li>如果域宽为*，则由对应的函数参数的值为当前域宽。如果仅给出了小数点，则域宽为0</li>
+</ol>
+</li>
+<li><p>length</p>
+<p>  指出浮点型参数或整型参数的长度</p>
+<ol>
+<li>hh 对于整数类型，printf期待一个从char提升的int尺寸的整型参数。</li>
+<li>h  对于整数类型，printf期待一个从short提升的int尺寸的整型参数。</li>
+<li>l<ul>
+<li>对于整数类型，printf期待一个long尺寸的整型参数。</li>
+<li>对于浮点类型，printf期待一个double尺寸的整型参数.</li>
+<li>对于字符串s类型，printf期待一个wchar_t指针参数。对于字符c类型，printf期待一个wint_t型的参数。</li>
+</ul>
+</li>
+<li>ll 对于整数类型，printf期待一个long long尺寸的整型参数。Microsoft也可以使用I64。</li>
+<li>L 对于浮点类型，printf期待一个long double尺寸的整型参数。</li>
+<li>z 对于整数类型，printf期待一个size_t尺寸的整型参数。</li>
+<li>j 对于整数类型，printf期待一个intmax_t尺寸的整型参数。</li>
+<li>t 对于整数类型，printf期待一个ptrdiff_t尺寸的整型参数。</li>
+</ol>
 </li>
 </ul>
-<h4 id="condition-条件"><a href="#condition-条件" class="headerlink" title="condition(条件)"></a>condition(条件)</h4><ul>
-<li><p>[condition] &lt;断点号> &lt;condition><br>当满足&lt;condition>时在此断点（包含watchpoint）处停下，&lt;condition>使用C语法。比如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(gdb) condition 2 *format == &apos;\n&apos;</span><br><span class="line">(gdb) n</span><br><span class="line"></span><br><span class="line">Hardware watchpoint 2: *format</span><br><span class="line"></span><br><span class="line">Old value = 33 &apos;!&apos;</span><br><span class="line">New value = 10 &apos;\n&apos;</span><br><span class="line">Print::printf (format=0xc01054f4 &quot;\n&quot;) at src/print.cpp:65</span><br><span class="line">65	    while (*format)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>[break]/[watch] &lt;where> if &lt;condition><br>如果满足&lt;condition>，在&lt;where>设置断点或Watch Point。</p>
-</li>
+<h4 id="类型标识字符"><a href="#类型标识字符" class="headerlink" title="类型标识字符"></a>类型标识字符</h4><ul>
+<li>d，i有符号十进制数值int。’%d’与’%i’对于输出是同义；但对于scanf()输入二者不同，其中%i在输入值有前缀0x或0时，分别表示16进制或8进制的值。如果指定了精度，则输出的数字不足时在左侧补0。默认精度为1。精度为0且值为0，则输出为空。</li>
+<li>u，十进制unsigned int。如果指定了精度，则输出的数字不足时在左侧补0。默认精度为1。精度为0且值为0，则输出为空。</li>
+<li>f，F,double型输出10进制定点表示。’f’与’F’差异是表示无穷与NaN时，’f’输出’inf’, ‘infinity’与’nan’；’F’输出’INF’, ‘INFINITY’与’NAN’。小数点后的数字位数等于精度，最后一位数字四舍五入。精度默认为6。如果精度为0且没有#标记，则不出现小数点。小数点左侧至少一位数字。</li>
+<li>e，E, double值，输出形式为10进制的([-]d.ddd e[+/-]ddd). E版本使用的指数符号为E（而不是e）。指数部分至少包含2位数字，如果值为0，则指数部分为00。Windows系统，指数部分至少为3位数字，例如1.5e002，也可用Microsoft版的运行时函数_set_output_format 修改。小数点前存在1位数字。小数点后的数字位数等于精度。精度默认为6。如果精度为0且没有#标记，则不出现小数点。</li>
+<li>g，G, double型数值，精度定义为全部有效数字位数。当指数部分在闭区间 [-4,5] 内，输出为定点形式；否则输出为指数浮点形式。’g’使用小写字母，’G’使用大写字母。小数点右侧的尾数0不被显示；显示小数点仅当输出的小数部分不为0。</li>
+<li>x，X16进制unsigned int。’x’使用小写字母；’X’使用大写字母。如果指定了精度，则输出的数字不足时在左侧补0。默认精度为1。精度为0且值为0，则输出为空。</li>
+<li>o，8进制unsigned int。如果指定了精度，则输出的数字不足时在左侧补0。默认精度为1。精度为0且值为0，则输出为空。</li>
+<li>s，如果没有用l标志，输出null结尾字符串直到精度规定的上限；如果没有指定精度，则输出所有字节。如果用了l标志，则对应函数参数指向wchar_t型的数组，输出时把每个宽字符转化为多字节字符，相当于调用wcrtomb函数。</li>
+<li>c，如果没有用l标志，把int参数转为unsigned char型输出；如果用了l标志，把wint_t参数转为包含两个元素的wchart_t数组，其中第一个元素包含要输出的字符，第二个元素为null宽字符。</li>
+<li>p，void *型</li>
+<li>a，A，double型的16进制表示，”[−]0xh.hhhh p±d”。其中指数部分为10进制表示的形式。例如：1025.010输出为0x1.004000p+10。’a’使用小写字母，’A’使用大写字母。[2][3] （C++11流使用hexfloat输出16进制浮点数）</li>
+<li>n，不输出字符，但是把已经成功输出的字符个数写入对应的整型指针参数所指的变量。</li>
+<li>%，’%’字面值，不接受任何flags, width, precision or length。<h3 id="怎么做"><a href="#怎么做" class="headerlink" title="怎么做"></a>怎么做</h3></li>
 </ul>
-<h4 id="查看当前运行情况"><a href="#查看当前运行情况" class="headerlink" title="查看当前运行情况"></a>查看当前运行情况</h4><ul>
-<li>[p]rint/&lt;format> &lt;表达式&gt;<br>打印表达式的值，表达式可以是变量名、内存地址、寄存器（使用$代替%）或者包含它们的运算表达式（C语言风格）。<br>其中format可以有下边的形式：<ul>
-<li>a 指针。</li>
-<li>c Read as integer, print as character。</li>
-<li>d 整数，十进制格式打印。</li>
-<li>f 浮点数。</li>
-<li>o 整数，八进制打印。</li>
-<li>s 尝试作为C字符串处理。</li>
-<li>t 整数，二进制处理 (t = two)。</li>
-<li>u 整数，无符号十进制数。</li>
-<li>x 整数，十六进制打印。</li>
-</ul>
-</li>
-<li>[ x]/nfu &lt;地址><br>打印所给地址内容<ul>
-<li>n（number）要打印的单元数，默认是1。如果打印的是数组，这个很有用。</li>
-<li>f（format）打印的格式，和print一样，除了<code>i</code>，这里会打印一个指令。 在print中会被认为是无效命令。</li>
-<li>u（unit_size）单元的大小，可以设置为[b]ytes（1字节）、[h]alfwords（2字节）、[w]ords（4字节）、[g]iant（8字节）。</li>
-</ul>
-</li>
-<li>[display]/&lt;format> &lt;表达式&gt;<br>和print基本一致，但会在gdb每次接收输入后重复执行一次。和断点一样，display也有enable和disable指令。</li>
-<li>[undisplay]/&lt;display号><br>删除某个display。</li>
-<li>[disassemble]<br>反编译当前函数。</li>
-<li>[disassemble] &lt;函数名><br>反编译所给函数。</li>
-</ul>
-<h4 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h4><ul>
-<li>[r]un(arg1 arg2 … argn)<br>运行已经加载的程序。</li>
-<li>[c]ontinue<br>重新执行已经停止的应用程序，在一下个断点处再次停止。</li>
-<li>[k]ill<br>杀死当前调试的进程</li>
-<li>[s]tep<br>源码级别执行下一行代码，如果是函数则跳进函数。</li>
-<li>[s]tep[i]<br>x86指令级别执行下一条代码，如果是函数则跳进函数。</li>
-<li>[n]ext<br>源码级别执行下一行代码，如果是函数不进入直接使用其返回值。</li>
-<li>[n]ext[i]<br>x86指令级别执行下一条代码，如果是函数不进入直接使用其返回值。</li>
-<li>[finish]<br>继续执行，直到当前函数返回。</li>
-</ul>
-<h4 id="源码查看"><a href="#源码查看" class="headerlink" title="源码查看"></a>源码查看</h4><ul>
-<li>[l]ist</li>
-<li>[l]ist &lt;filename>:&lt;function></li>
-<li>[l]ist &lt;filename>:&lt;line_number></li>
-<li>[l]ist &lt;first>:&lt;last><br>查看源代码，可以通过文件名：行号、文件名：函数名来查看。默认打印<em>listsize</em>行，还可以指定<em>first</em>和<em>last</em>来指定查看行范围，同时也可以只指定<em>last</em>。</li>
-<li>set listsize &lt;行数&gt;<br>设置list打印的行数。</li>
-</ul>
-<h4 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h4><ul>
-<li>[i]nfo [f]rame<br>列出当前栈帧。</li>
-<li>[i]nfo [s]tack<br>列出调用栈，和它们的参数。使用命令[b]acktrace和[where]也可以达到同样目的。</li>
-<li>[i]nfo [r]egisters<br>列出寄存器内容。将[r]egisters替换为[all-r]egisters列出更多寄存器。</li>
-<li>[i]nfo [b]reak<br>列出每个断点的断点号、地址、所在函数、被命中几次等信息。</li>
-<li>[i]nfo [fu]nctions<br>列出所有函数签名。信息包括文件名和行号。<h4 id="TUI"><a href="#TUI" class="headerlink" title="TUI"></a>TUI</h4>TextUser Interface，GDB的文本用户界面，可以方便的显示源码、汇编、寄存器，TUI效果如下：<br><img src="https://inlow.xiaojumao.club/image/png/gdb-tui.png" alt="gdb-tui"><br>使用control + x a来启动TUI，再按这个组合键退出TUI。</li>
-</ul>
-<p>gdb调试命令参考于<a href="https://darkdust.net/files/GDB%20Cheat%20Sheet.pdf" target="_blank" rel="noopener">GDB Cheat Sheet</a>和<a href="https://cs.brown.edu/courses/cs033/docs/guides/gdb.pdf" target="_blank" rel="noopener">gdb Cheatsheet</a></p>
+<p>具体来看就是扫描format specification做词法分析，然后状态机去处理标准的format specifier，最后通过解析好的format来确定可变参数的类型和个数。</p>
+<p>TODO:太晚了，明天写吧</p>
 
       
     </div>
@@ -613,11 +644,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Debug/" rel="tag"># Debug</a>
+            <a href="/tags/Printf/" rel="tag"># Printf</a>
           
-            <a href="/tags/GDB/" rel="tag"># GDB</a>
-          
-            <a href="/tags/QEMU/" rel="tag"># QEMU</a>
+            <a href="/tags/VGA/" rel="tag"># VGA</a>
           
         </div>
       
@@ -650,8 +679,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/01/21/Paging/" rel="next" title="开启分页">
-                <i class="fa fa-chevron-left"></i> 开启分页
+              <a href="/2020/06/26/OS-Specific-Toolchain/" rel="next" title="OS-Specific-Toolchain">
+                <i class="fa fa-chevron-left"></i> OS-Specific-Toolchain
               </a>
             
           </div>
@@ -659,10 +688,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/02/25/Memory-Management/" rel="prev" title="内存管理">
-                内存管理 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -919,7 +944,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#工具"><span class="nav-number">1.</span> <span class="nav-text">工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调试过程"><span class="nav-number">2.</span> <span class="nav-text">调试过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GDB常用命令"><span class="nav-number">3.</span> <span class="nav-text">GDB常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#断点"><span class="nav-number">3.1.</span> <span class="nav-text">断点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#WatchPoint"><span class="nav-number">3.2.</span> <span class="nav-text">WatchPoint</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#condition-条件"><span class="nav-number">3.3.</span> <span class="nav-text">condition(条件)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看当前运行情况"><span class="nav-number">3.4.</span> <span class="nav-text">查看当前运行情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#运行"><span class="nav-number">3.5.</span> <span class="nav-text">运行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#源码查看"><span class="nav-number">3.6.</span> <span class="nav-text">源码查看</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#信息"><span class="nav-number">3.7.</span> <span class="nav-text">信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TUI"><span class="nav-number">3.8.</span> <span class="nav-text">TUI</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#是什么"><span class="nav-number">1.</span> <span class="nav-text">是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#格式字符串"><span class="nav-number">1.1.</span> <span class="nav-text">格式字符串</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类型标识字符"><span class="nav-number">1.2.</span> <span class="nav-text">类型标识字符</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#怎么做"><span class="nav-number">2.</span> <span class="nav-text">怎么做</span></a></li></ol></div>
             
 
           </div>
