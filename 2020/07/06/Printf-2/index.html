@@ -105,18 +105,18 @@
 
 
 
-  <meta name="description" content="这篇博客算是之前文章的一个补充，详细介绍一下printf，这次是一个比较完善完整的类Unix实现。">
+  <meta name="description" content="这篇博客算是之前文章的一个补充，详细介绍一下printf，这次是一个比较完善完整的POSIX实现。">
 <meta name="keywords" content="Printf,VGA">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Printf-2">
 <meta property="og:url" content="https://blog.inlow.online/2020/07/06/Printf-2/index.html">
 <meta property="og:site_name" content="INLOW开发博客">
-<meta property="og:description" content="这篇博客算是之前文章的一个补充，详细介绍一下printf，这次是一个比较完善完整的类Unix实现。">
+<meta property="og:description" content="这篇博客算是之前文章的一个补充，详细介绍一下printf，这次是一个比较完善完整的POSIX实现。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-07-07T17:13:56.251Z">
+<meta property="og:updated_time" content="2020-07-08T12:18:16.012Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Printf-2">
-<meta name="twitter:description" content="这篇博客算是之前文章的一个补充，详细介绍一下printf，这次是一个比较完善完整的类Unix实现。">
+<meta name="twitter:description" content="这篇博客算是之前文章的一个补充，详细介绍一下printf，这次是一个比较完善完整的POSIX实现。">
 
 
 
@@ -401,7 +401,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-07-08 01:13:56" itemprop="dateModified" datetime="2020-07-08T01:13:56+08:00">2020-07-08</time>
+                <time title="修改时间：2020-07-08 20:18:16" itemprop="dateModified" datetime="2020-07-08T20:18:16+08:00">2020-07-08</time>
               
             
           </span>
@@ -470,7 +470,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">4.1k</span>
+                <span title="本文字数">4k</span>
               
 
               
@@ -504,21 +504,20 @@
       
 
       
-        <p>这篇博客算是<a href="https://blog.inlow.online/2019/01/08/Printf/">之前文章</a>的一个补充，详细介绍一下<code>printf</code>，这次是一个比较完善完整的类Unix实现。</p>
+        <p>这篇博客算是<a href="https://blog.inlow.online/2019/01/08/Printf/">之前文章</a>的一个补充，详细介绍一下<code>printf</code>，这次是一个比较完善完整的POSIX实现。</p>
 <a id="more"></a>
-<p><code>printf</code>，格式化输出字符串到stdout，看似简单，实则挺麻烦的一个函数。首先先了解一下Posix规定的<code>printf</code>的全部功能，然后再看具体实现的算法。</p>
-<h3 id="是什么"><a href="#是什么" class="headerlink" title="是什么"></a>是什么</h3><p>Posix规定了<code>printf</code>诸多功能，太基础的基本概念这篇就不说了，从格式化说起。</p>
-<p>Posix中描述了五个<code>printf</code>族函数，分别是<code>dprintf</code>，<code>fprintf</code>，<code>printf</code>，<code>snprintf</code>，<code>sprintf</code>，其中<code>dprintf</code>是对标准的扩展，在多数系统中都有实现，INWOX也不例外。</p>
+<p><code>printf</code>，格式化输出字符串到stdout，看似简单，实则挺麻烦的一个函数。首先先了解一下POSIX规定的<code>printf</code>的全部功能，然后再看具体实现的算法。</p>
+<h3 id="是什么"><a href="#是什么" class="headerlink" title="是什么"></a>是什么</h3><p>POSIX规定了<code>printf</code>诸多功能，太基础的基本概念这篇就不说了，从格式化说起。</p>
+<p>POSIX中描述了五个<code>printf</code>族函数，分别是<code>dprintf</code>，<code>fprintf</code>，<code>printf</code>，<code>snprintf</code>，<code>sprintf</code>，其中<code>dprintf</code>是对标准的扩展，在多数系统中都有实现，INWOX也不例外。</p>
 <p><code>printf</code>将输出内容放到标准输出流stdout上，<code>fprintf</code>将输出内容放到给定命名的输出流上，<code>sprintf</code>将输出内容放到给定地址然后在最后加上’\0’，调用者要确保给定地址的大小足够，<code>snprintf</code>和<code>sprintf</code>功能一致，只是限制了内容大小，而<code>dprintf</code>则是将内容输出到文件，与<code>fprintf</code>不同的是，此函数第一个参数是文件描述符而不是FILE指针。</p>
-<p>话不多说，直接看格式</p>
-<h4 id="格式字符串"><a href="#格式字符串" class="headerlink" title="格式字符串"></a>格式字符串</h4><p><code>%[parameter][flags][width][.precision][length]type</code><br>格式字符串由0个或多个指令组成：普通字符（不是%）原样复制到输出流，或conversion specifications（以%开头），每个conversion specifications都会获取0个或多个后续的参数，然后以conversion specifier结尾，在这中间有三个可选的标志，分别为：最小字段宽度、精度、长度。</p>
+<h4 id="格式字符串"><a href="#格式字符串" class="headerlink" title="格式字符串"></a>格式字符串</h4><p><code>%[parameter][flags][width][.precision][length]type</code><br>格式字符串由0个或多个指令组成：普通字符（不是%）原样复制到输出流，或conversion specifications（以%开头），每个conversion specifications都会获取0个或多个后续的参数，然后以conversion specifier结尾，在这中间有三个可选的标志，分别为：位置参数、对齐相关参数、最小字段宽度、精度、长度。</p>
 <ul>
 <li><p>parameter</p>
 <ol>
 <li><code>n$</code>，<code>n</code>是数字，表示第n个参数，这使得一个参数可以输出多次，如果任意一个占位符使用了parameter，那么其他占位符都需要使用，这是posix扩展，不是ISO C标准<blockquote>
 <p>例子</p>
 <p><code>printf(&quot;%3$d %3$#X, %1$d %1$#X, %2$d %2$#X&quot;, 1, 10, 100);</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; 100 0X64, 1 0X1, 10 0XA</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">100 0X64, 1 0X1, 10 0XA</span><br></pre></td></tr></table></figure>
 </blockquote>
 </li>
 </ol>
@@ -529,32 +528,32 @@
 <blockquote>
 <p>例子</p>
 <p><code>printf(&quot;%+d %+d %d %d\n&quot;, 10, -10, 10, -10);</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; +10 -10 10 -10</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+10 -10 10 -10</span><br></pre></td></tr></table></figure>
 </blockquote>
 </li>
 <li><p><code>-</code>，左对齐。缺省情况是右对齐。</p>
 <blockquote>
 <p>例子</p>
 <p><code>printf(&quot;|%-20d|%20d|\n&quot;, 100, 100);</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; |100                 |                 100|</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">|100                 |                 100|</span><br></pre></td></tr></table></figure>
 </blockquote>
 </li>
 <li><p><code>space</code>，使有符号数的输出如果没有正负号或者输出0个字符，则前缀1个空格。如果空格与’+’同时出现，则空格说明符被忽略。</p>
 <blockquote>
 <p>例子</p>
 <p><code>printf(&quot;|% d|%d|\n&quot;, 10, 10);</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; | 10|10|</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">| 10|10|</span><br></pre></td></tr></table></figure>
 </blockquote>
 </li>
 <li><p><code>#</code>，对于’g’与’G’，不删除尾部0以表示精度。对于’f’, ‘F’, ‘e’, ‘E’, ‘g’, ‘G’, 总是输出小数点。对于’o’, ‘x’, ‘X’, 在非0数值前分别输出前缀0, 0x, 0X表示数制。</p>
 <blockquote>
 <p>例子</p>
 <p><code>printf(&quot;%#G %G\n&quot;, 1.0, 1.0);</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; 1.00000 1</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1.00000 1</span><br></pre></td></tr></table></figure>
 </blockquote>
 <blockquote>
 <p><code>printf(&quot;%#x %x\n&quot;, 10, 10);</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; 0xa a</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0xa a</span><br></pre></td></tr></table></figure>
 </blockquote>
 </li>
 <li><p><code>0</code>，如果width选项前缀以0，则在左侧用0填充直至达到宽度要求，如果0与-均出现，则0被忽略，即左对齐依然用空格填充。</p>
@@ -562,7 +561,7 @@
 <p>例子</p>
 <p><code>printf(&quot;|%020d|%20d|\n&quot;, 1, 1);</code></p>
 <p><code>printf(&quot;|%020d|%20d|\n&quot;, -1, -1);</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; |00000000000000000001|                   1|</span><br><span class="line">&gt;</span><br><span class="line">&gt; |-0000000000000000001|                  -1|</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">|00000000000000000001|                   1|</span><br><span class="line"></span><br><span class="line">|-0000000000000000001|                  -1|</span><br></pre></td></tr></table></figure>
 </blockquote>
 </li>
 </ol>
@@ -572,7 +571,7 @@
 <blockquote>
 <p>例子</p>
 <p><code>printf(&quot;|%20d|%d|\n&quot;, 10, 10);</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; |                  10|10|</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">|                  10|10|</span><br></pre></td></tr></table></figure>
 </blockquote>
 </li>
 <li><p>precision，可以直接给定也可以忽略，或者使用<code>*</code>指定参数的值</p>
@@ -604,20 +603,23 @@
 </ol>
 </li>
 </ul>
+<blockquote>
+<p>来个稍微麻烦点的看看：<br><code>printf(&quot;|%2$+10.5hhd|%1$c|\n&quot;, &#39;a&#39;, &#39;b&#39;);</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">|    +00098|a|</span><br></pre></td></tr></table></figure></p>
+</blockquote>
 <h4 id="类型标识字符"><a href="#类型标识字符" class="headerlink" title="类型标识字符"></a>类型标识字符</h4><ul>
-<li>d，i有符号十进制数值int。’%d’与’%i’对于输出是同义；但对于scanf()输入二者不同，其中%i在输入值有前缀0x或0时，分别表示16进制或8进制的值。如果指定了精度，则输出的数字不足时在左侧补0。默认精度为1。精度为0且值为0，则输出为空。</li>
+<li>d，i有符号十进制数值int。<code>%d</code>与<code>%i</code>对于输出是同义；但对于scanf()输入二者不同，其中%i在输入值有前缀0x或0时，分别表示16进制或8进制的值。如果指定了精度，则输出的数字不足时在左侧补0。默认精度为1。精度为0且值为0，则输出为空。</li>
 <li>u，十进制unsigned int。如果指定了精度，则输出的数字不足时在左侧补0。默认精度为1。精度为0且值为0，则输出为空。</li>
-<li>f，F,double型输出10进制定点表示。’f’与’F’差异是表示无穷与NaN时，’f’输出’inf’, ‘infinity’与’nan’；’F’输出’INF’, ‘INFINITY’与’NAN’。小数点后的数字位数等于精度，最后一位数字四舍五入。精度默认为6。如果精度为0且没有#标记，则不出现小数点。小数点左侧至少一位数字。</li>
-<li>e，E, double值，输出形式为10进制的([-]d.ddd e[+/-]ddd). E版本使用的指数符号为E（而不是e）。指数部分至少包含2位数字，如果值为0，则指数部分为00。Windows系统，指数部分至少为3位数字，例如1.5e002，也可用Microsoft版的运行时函数_set_output_format 修改。小数点前存在1位数字。小数点后的数字位数等于精度。精度默认为6。如果精度为0且没有#标记，则不出现小数点。</li>
-<li>g，G, double型数值，精度定义为全部有效数字位数。当指数部分在闭区间 [-4,5] 内，输出为定点形式；否则输出为指数浮点形式。’g’使用小写字母，’G’使用大写字母。小数点右侧的尾数0不被显示；显示小数点仅当输出的小数部分不为0。</li>
-<li>x，X16进制unsigned int。’x’使用小写字母；’X’使用大写字母。如果指定了精度，则输出的数字不足时在左侧补0。默认精度为1。精度为0且值为0，则输出为空。</li>
+<li>f，F，double型输出10进制定点表示。<code>%f</code>与<code>%F</code>差异是表示无穷与NaN时，<code>%f</code>输出<code>inf</code>，<code>infinity</code>与<code>nan</code>，<code>%F</code>输出<code>INF</code>，<code>INFINITY</code>与<code>NAN</code>。小数点后的数字位数等于精度，最后一位数字四舍五入。精度默认为6。如果精度为0且没有#标记，则不出现小数点。小数点左侧至少一位数字。</li>
+<li>e，E，double值，输出形式为10进制的([-]d.ddd e[+/-]ddd). E版本使用的指数符号为E（而不是e）。指数部分至少包含2位数字，如果值为0，则指数部分为00。小数点前存在1位数字。小数点后的数字位数等于精度。精度默认为6。如果精度为0且没有#标记，则不出现小数点。</li>
+<li>g，G，double型数值，精度定义为全部有效数字位数。当指数部分在闭区间 [-4,5] 内，输出为定点形式；否则输出为指数浮点形式。<code>%g</code>使用小写字母，<code>%G</code>使用大写字母。小数点右侧的尾数0不被显示；显示小数点仅当输出的小数部分不为0。</li>
+<li>x，X16进制unsigned int。<code>%x</code>使用小写字母；<code>%X</code>使用大写字母。如果指定了精度，则输出的数字不足时在左侧补0。默认精度为1。精度为0且值为0，则输出为空。</li>
 <li>o，8进制unsigned int。如果指定了精度，则输出的数字不足时在左侧补0。默认精度为1。精度为0且值为0，则输出为空。</li>
 <li>s，如果没有用l标志，输出null结尾字符串直到精度规定的上限；如果没有指定精度，则输出所有字节。如果用了l标志，则对应函数参数指向wchar_t型的数组，输出时把每个宽字符转化为多字节字符，相当于调用wcrtomb函数。</li>
 <li>c，如果没有用l标志，把int参数转为unsigned char型输出；如果用了l标志，把wint_t参数转为包含两个元素的wchart_t数组，其中第一个元素包含要输出的字符，第二个元素为null宽字符。</li>
 <li>p，void *型</li>
-<li>a，A，double型的16进制表示，”[−]0xh.hhhh p±d”。其中指数部分为10进制表示的形式。例如：1025.010输出为0x1.004000p+10。’a’使用小写字母，’A’使用大写字母。[2][3] （C++11流使用hexfloat输出16进制浮点数）</li>
+<li>a，A，double型的16进制表示，”[−]0xh.hhhh p±d”。其中指数部分为10进制表示的形式。例如：1025.010输出为0x1.004000p+10。<code>%a</code>使用小写字母，<code>%A</code>使用大写字母。</li>
 <li>n，不输出字符，但是把已经成功输出的字符个数写入对应的整型指针参数所指的变量。</li>
-<li>%，’%’字面值，不接受任何flags, width, precision or length。<h3 id="怎么做"><a href="#怎么做" class="headerlink" title="怎么做"></a>怎么做</h3></li>
+<li>%，<code>%</code>字面值，不接受任何flags，width，precision和length。<h3 id="怎么做"><a href="#怎么做" class="headerlink" title="怎么做"></a>怎么做</h3></li>
 </ul>
 <p>具体来看就是扫描format specification做词法分析，然后状态机去处理标准的format specifier，最后通过解析好的format来确定可变参数的类型和个数。</p>
 <p>TODO:太晚了，明天写吧</p>
@@ -976,7 +978,7 @@
       <i class="fa fa-area-chart"></i>
     </span>
     
-    <span title="站点总字数">110k</span>
+    <span title="站点总字数">109k</span>
   
 
   
