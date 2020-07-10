@@ -113,7 +113,7 @@
 <meta property="og:site_name" content="INLOW开发博客">
 <meta property="og:description" content="这篇博客算是之前文章的一个补充，详细介绍一下printf，这次是一个比较完善完整的POSIX实现。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-07-08T12:18:16.012Z">
+<meta property="og:updated_time" content="2020-07-10T16:49:11.171Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Printf-2">
 <meta name="twitter:description" content="这篇博客算是之前文章的一个补充，详细介绍一下printf，这次是一个比较完善完整的POSIX实现。">
@@ -401,7 +401,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-07-08 20:18:16" itemprop="dateModified" datetime="2020-07-08T20:18:16+08:00">2020-07-08</time>
+                <time title="修改时间：2020-07-11 00:49:11" itemprop="dateModified" datetime="2020-07-11T00:49:11+08:00">2020-07-11</time>
               
             
           </span>
@@ -470,7 +470,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">4k</span>
+                <span title="本文字数">7.6k</span>
               
 
               
@@ -484,7 +484,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">10 分钟</span>
+                <span title="阅读时长">19 分钟</span>
               
             </div>
           
@@ -578,28 +578,28 @@
 <p>  通常指明输出的最大长度，依赖于特定的格式化类型</p>
 <ol>
 <li>d、i、u、x、o的整型数值，是指最小数字位数，不足的位要在左侧补0，如果超过也不截断，缺省值为1</li>
-<li>a,A,e,E,f,F的浮点数值，指小数点右边显示的数字位数，必要时四舍五入或补0；缺省值为6</li>
-<li>对于g,G的浮点数值，指有效数字的最大位数；缺省值为6</li>
-<li>对于s的字符串类型，是指输出的字节的上限，超出限制的其它字符将被截断</li>
+<li>a、A、e、E、f、F的浮点数值，指小数点右边显示的数字位数，必要时四舍五入或补0；缺省值为6</li>
+<li>对应于g、G的浮点数值，指有效数字的最大位数；缺省值为6</li>
+<li>对应于s的字符串类型，是指输出的字节的上限，超出限制的其它字符将被截断</li>
 <li>如果域宽为*，则由对应的函数参数的值为当前域宽。如果仅给出了小数点，则域宽为0</li>
 </ol>
 </li>
 <li><p>length</p>
 <p>  指出浮点型参数或整型参数的长度</p>
 <ol>
-<li>hh 对于整数类型，printf期待一个从char提升的int尺寸的整型参数。</li>
-<li>h  对于整数类型，printf期待一个从short提升的int尺寸的整型参数。</li>
+<li>hh对应于整数类型，printf期待一个从char提升到int尺寸的整型参数。</li>
+<li>h对应于整数类型，printf期待一个从short提升到int尺寸的整型参数。</li>
 <li>l<ul>
-<li>对于整数类型，printf期待一个long尺寸的整型参数。</li>
-<li>对于浮点类型，printf期待一个double尺寸的整型参数.</li>
-<li>对于字符串s类型，printf期待一个wchar_t指针参数。对于字符c类型，printf期待一个wint_t型的参数。</li>
+<li>对应于整数类型，printf期待一个long尺寸的整型参数。</li>
+<li>对应于浮点类型，printf期待一个double尺寸的整型参数.</li>
+<li>对应于字符串s类型，printf期待一个wchar_t指针参数。对于字符c类型，printf期待一个wint_t型的参数。</li>
 </ul>
 </li>
-<li>ll 对于整数类型，printf期待一个long long尺寸的整型参数。Microsoft也可以使用I64。</li>
-<li>L 对于浮点类型，printf期待一个long double尺寸的整型参数。</li>
-<li>z 对于整数类型，printf期待一个size_t尺寸的整型参数。</li>
-<li>j 对于整数类型，printf期待一个intmax_t尺寸的整型参数。</li>
-<li>t 对于整数类型，printf期待一个ptrdiff_t尺寸的整型参数。</li>
+<li>ll对应于整数类型，printf期待一个long long尺寸的整型参数。Microsoft也可以使用I64。</li>
+<li>L对应于浮点类型，printf期待一个long double尺寸的整型参数。</li>
+<li>z对应于整数类型，printf期待一个size_t尺寸的整型参数。</li>
+<li>j对应于整数类型，printf期待一个intmax_t尺寸的整型参数。</li>
+<li>t对应于整数类型，printf期待一个ptrdiff_t尺寸的整型参数。</li>
 </ol>
 </li>
 </ul>
@@ -622,7 +622,14 @@
 <li>%，<code>%</code>字面值，不接受任何flags，width，precision和length。<h3 id="怎么做"><a href="#怎么做" class="headerlink" title="怎么做"></a>怎么做</h3></li>
 </ul>
 <p>具体来看就是扫描format specification做词法分析，然后状态机去处理标准的format specifier，最后通过解析好的format来确定可变参数的类型和个数。</p>
-<p>TODO:太晚了，明天写吧</p>
+<h4 id="解析parameter"><a href="#解析parameter" class="headerlink" title="解析parameter"></a>解析parameter</h4><p>// TODO</p>
+<h4 id="解析flags"><a href="#解析flags" class="headerlink" title="解析flags"></a>解析flags</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> flags = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    <span class="keyword">switch</span> (*++format) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'-'</span>: flags |= FLAG_LEFT_JUSTIFIED; <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'+'</span>: flags |= FLAG_PLUS; <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">' '</span>: flags |= FLAG_SPACE; <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'#'</span>: flags |= FLAG_ALTERNATIVE; <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'0'</span>: flags |= FLAG_LEADING_ZEROS; <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="解析width"><a href="#解析width" class="headerlink" title="解析width"></a>解析width</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> fieldWidth = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">if</span> (*format == <span class="string">'*'</span>) &#123;</span><br><span class="line">    fieldWidth = va_arg(vl, <span class="keyword">int</span>);</span><br><span class="line">    <span class="keyword">if</span> (fieldWidth &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        flags |= FLAG_LEFT_JUSTIFIED;</span><br><span class="line">        fieldWidth = -fieldWidth;</span><br><span class="line">    &#125;</span><br><span class="line">    format++;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (*format &gt;= <span class="string">'0'</span> &amp;&amp; *format &lt;= <span class="string">'9'</span>) &#123;</span><br><span class="line">        fieldWidth = fieldWidth * <span class="number">10</span> + *format - <span class="string">'0'</span>;</span><br><span class="line">        format++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="解析precision"><a href="#解析precision" class="headerlink" title="解析precision"></a>解析precision</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> precision = <span class="number">-1</span>;</span><br><span class="line"><span class="keyword">if</span> (*format == <span class="string">'.'</span>) &#123;</span><br><span class="line">    format++;</span><br><span class="line">    <span class="keyword">if</span> (*format == <span class="string">'*'</span>) &#123;</span><br><span class="line">        precision = va_arg(vl, <span class="keyword">int</span>);</span><br><span class="line">        format++;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        precision = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (*format &gt;= <span class="string">'0'</span> &amp;&amp; *format &lt;= <span class="string">'9'</span>) &#123;</span><br><span class="line">            precision = precision * <span class="number">10</span> + *format - <span class="string">'0'</span>;</span><br><span class="line">            format++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="解析length"><a href="#解析length" class="headerlink" title="解析length"></a>解析length</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> length = LENGTH_INT;</span><br><span class="line"><span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    <span class="keyword">switch</span> (*format++) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'h'</span>:</span><br><span class="line">        <span class="keyword">if</span> (length == LENGTH_SHORT_H) &#123;</span><br><span class="line">            length = LENGTH_CHAR_HH;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        length = LENGTH_SHORT_H;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'l'</span>:</span><br><span class="line">        <span class="keyword">if</span> (length == LENGTH_LONG_L) &#123;</span><br><span class="line">            length  = LENGTH_LONG_LONG_LL;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        length = LENGTH_LONG_L;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'j'</span>:</span><br><span class="line">        length = LENGTH_INTMAX_J;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'z'</span>:</span><br><span class="line">        length = LENGTH_SIZE_Z;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'t'</span>:</span><br><span class="line">        length = LENGTH_PTRDIFF_T;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'L'</span>:</span><br><span class="line">        length = LENGTH_LONG_DOUBLE_L;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        format--;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="解析type"><a href="#解析type" class="headerlink" title="解析type"></a>解析type</h4><p>这里主要是获取到不同的数据类型后，根据前边获取到的修饰参数进行最后输出，关键代码如下：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> (specifier) &#123;</span><br><span class="line"><span class="keyword">case</span> <span class="string">'d'</span>: <span class="keyword">case</span> <span class="string">'i'</span>: <span class="keyword">case</span> <span class="string">'o'</span>: <span class="keyword">case</span> <span class="string">'u'</span>: <span class="keyword">case</span> <span class="string">'x'</span>: <span class="keyword">case</span> <span class="string">'X'</span>:</span><br><span class="line">    <span class="keyword">if</span> (precision &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        precision = <span class="number">1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        flags &amp;= ~FLAG_LEADING_ZEROS;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    written = printInteger(param, callback, specifier, value,</span><br><span class="line">            fieldWidth, precision, flags);</span><br><span class="line">    <span class="keyword">if</span> (written &lt; <span class="number">0</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    INCREMENT_RESULT(written);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="string">'c'</span>:</span><br><span class="line">    c = (<span class="keyword">char</span>) va_arg(vl, <span class="keyword">int</span>);</span><br><span class="line">    written = printString(param, callback, &amp;c, <span class="number">1</span>, fieldWidth,</span><br><span class="line">            flags);</span><br><span class="line">    <span class="keyword">if</span> (written &lt; <span class="number">0</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    INCREMENT_RESULT(written);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="string">'s'</span>:</span><br><span class="line">    s = va_arg(vl, <span class="keyword">const</span> <span class="keyword">char</span>*);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (precision &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        size = <span class="built_in">strlen</span>(s);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        size = strnlen(s, (<span class="keyword">size_t</span>) precision);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (size &gt; INT_MAX) <span class="keyword">goto</span> overflow;</span><br><span class="line"></span><br><span class="line">    written = printString(param, callback, s, (<span class="keyword">int</span>) size,</span><br><span class="line">            fieldWidth, flags);</span><br><span class="line">    <span class="keyword">if</span> (written &lt; <span class="number">0</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    INCREMENT_RESULT(written);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="string">'p'</span>:</span><br><span class="line">    value = (<span class="keyword">uintptr_t</span>) va_arg(vl, <span class="keyword">void</span>*);</span><br><span class="line">    written = printInteger(param, callback, <span class="string">'x'</span>, value, <span class="number">0</span>, <span class="number">1</span>,</span><br><span class="line">            FLAG_ALTERNATIVE);</span><br><span class="line">    <span class="keyword">if</span> (written &lt; <span class="number">0</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    INCREMENT_RESULT(written);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="string">'n'</span>:</span><br><span class="line">    *va_arg(vl, <span class="keyword">int</span>*) = result;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="string">'%'</span>:</span><br><span class="line">    <span class="keyword">if</span> (callback(param, <span class="string">"%"</span>, <span class="number">1</span>) != <span class="number">1</span>) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    INCREMENT_RESULT(<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">default</span>:</span><br><span class="line">    invalidConversion = <span class="literal">true</span>;</span><br><span class="line">    format = specifierBegin;</span><br><span class="line">    <span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>这个版本的printf基本实现了除<code>n$</code>之外POSIX规定的全部特性。</p>
+<p>printf功能其实挺多的，以后的代码libc可能会大面积移植现有成熟实现，主要开发、学习点聚焦在内核本身上。</p>
 
       
     </div>
@@ -946,7 +953,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#是什么"><span class="nav-number">1.</span> <span class="nav-text">是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#格式字符串"><span class="nav-number">1.1.</span> <span class="nav-text">格式字符串</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类型标识字符"><span class="nav-number">1.2.</span> <span class="nav-text">类型标识字符</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#怎么做"><span class="nav-number">2.</span> <span class="nav-text">怎么做</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#是什么"><span class="nav-number">1.</span> <span class="nav-text">是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#格式字符串"><span class="nav-number">1.1.</span> <span class="nav-text">格式字符串</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类型标识字符"><span class="nav-number">1.2.</span> <span class="nav-text">类型标识字符</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#怎么做"><span class="nav-number">2.</span> <span class="nav-text">怎么做</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#解析parameter"><span class="nav-number">2.1.</span> <span class="nav-text">解析parameter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解析flags"><span class="nav-number">2.2.</span> <span class="nav-text">解析flags</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解析width"><span class="nav-number">2.3.</span> <span class="nav-text">解析width</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解析precision"><span class="nav-number">2.4.</span> <span class="nav-text">解析precision</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解析length"><span class="nav-number">2.5.</span> <span class="nav-text">解析length</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解析type"><span class="nav-number">2.6.</span> <span class="nav-text">解析type</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
@@ -978,7 +985,7 @@
       <i class="fa fa-area-chart"></i>
     </span>
     
-    <span title="站点总字数">109k</span>
+    <span title="站点总字数">113k</span>
   
 
   
@@ -987,7 +994,7 @@
       <i class="fa fa-coffee"></i>
     </span>
     
-    <span title="站点阅读时长">4:34</span>
+    <span title="站点阅读时长">4:43</span>
   
 </div>
 
