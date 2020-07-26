@@ -113,7 +113,7 @@
 <meta property="og:site_name" content="INLOW开发博客">
 <meta property="og:description" content="这篇支持下PS/2键盘输入，PS/2控制器位于主板上，通常被称为键盘控制器，硬件原理不过多关注，主要说下如何从软件角度适配一个标准键盘。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-07-26T10:16:32.381Z">
+<meta property="og:updated_time" content="2020-07-26T10:17:49.124Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Keyboard">
 <meta name="twitter:description" content="这篇支持下PS/2键盘输入，PS/2控制器位于主板上，通常被称为键盘控制器，硬件原理不过多关注，主要说下如何从软件角度适配一个标准键盘。">
@@ -401,7 +401,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-07-26 18:16:32" itemprop="dateModified" datetime="2020-07-26T18:16:32+08:00">2020-07-26</time>
+                <time title="修改时间：2020-07-26 18:17:49" itemprop="dateModified" datetime="2020-07-26T18:17:49+08:00">2020-07-26</time>
               
             
           </span>
@@ -639,9 +639,7 @@
 <li>等待设备回复0xFA</li>
 <li>发送“身份识别”命令0xF2给设备</li>
 <li>等待设备回复0xFA</li>
-<li><p>等待设备最多回复2个字节的内容，用超时来结束等待（应为有些只会回复一个字节），下边是可能回复的字节及对应的设备类型</p>
-<p>  | Byte(s)                | Type                                 |<br>  | :—–:                | :–:                                 |<br>  | None                   | 转换开启的AT键盘，第二个PS/2端口不可能使用 |<br>  | 0x00                   | 标准PS/2鼠标                          |<br>  | 0x03                   | 带滚轮的鼠标                           |<br>  | 0x04                   | 5键鼠标                               |<br>  | 0xAB, 0x41或0xAB, 0xC1 | 开启转换的MF2键盘，第二个PS/2端口不可能使用|<br>  | 0xAB,0x83              | MF2键盘                              |</p>
-</li>
+<li>等待设备最多回复2个字节的内容，用超时来结束等待（应为有些只会回复一个字节），下边是可能回复的字节及对应的设备类型<br>  | Byte(s)                | Type                                 |<br>  | :—–:                | :–:                                 |<br>  | None                   | 转换开启的AT键盘，第二个PS/2端口不可能使用 |<br>  | 0x00                   | 标准PS/2鼠标                          |<br>  | 0x03                   | 带滚轮的鼠标                           |<br>  | 0x04                   | 5键鼠标                               |<br>  | 0xAB, 0x41或0xAB, 0xC1 | 开启转换的MF2键盘，第二个PS/2端口不可能使用|<br>  | 0xAB,0x83              | MF2键盘                              |</li>
 </ul>
 <p>在获取到设备类型后，别忘记取消“禁用扫描”功能。</p>
 <h3 id="PS-2键盘"><a href="#PS-2键盘" class="headerlink" title="PS/2键盘"></a>PS/2键盘</h3><p>PS/2键盘是使用串行通信与PS/2控制器通信的设备，理想情况下每种PS/2控制驱动程序都会提供标准的发送接收接口，而不用关心更底层的细节。PS/2键盘接收命令并发送命令的响应，还会发送按键或释放键的扫描码，然后PS/2控制器可能会改变（即转换）这些扫描码的信息，具体取决于控制器的设置。</p>
