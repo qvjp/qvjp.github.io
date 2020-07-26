@@ -113,7 +113,7 @@
 <meta property="og:site_name" content="INLOW开发博客">
 <meta property="og:description" content="这篇支持下PS/2键盘输入，PS/2控制器位于主板上，通常被称为键盘控制器，硬件原理不过多关注，主要说下如何从软件角度适配一个标准键盘。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-07-26T10:12:22.719Z">
+<meta property="og:updated_time" content="2020-07-26T10:16:32.381Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Keyboard">
 <meta name="twitter:description" content="这篇支持下PS/2键盘输入，PS/2控制器位于主板上，通常被称为键盘控制器，硬件原理不过多关注，主要说下如何从软件角度适配一个标准键盘。">
@@ -401,7 +401,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-07-26 18:12:22" itemprop="dateModified" datetime="2020-07-26T18:12:22+08:00">2020-07-26</time>
+                <time title="修改时间：2020-07-26 18:16:32" itemprop="dateModified" datetime="2020-07-26T18:16:32+08:00">2020-07-26</time>
               
             
           </span>
@@ -470,7 +470,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">8.8k</span>
+                <span title="本文字数">8.9k</span>
               
 
               
@@ -508,12 +508,122 @@
 <a id="more"></a>
 <h3 id="PS-2控制器"><a href="#PS-2控制器" class="headerlink" title="PS/2控制器"></a>PS/2控制器</h3><h4 id="历史"><a href="#历史" class="headerlink" title="历史"></a>历史</h4><p>在Intel 8048年代，IBM使用多功能PPI控制原始的单向、单通道外围设备，连接PC-XT键盘接口，在后来的PC-AT中，IBM引入了新键盘（带有新的双向协议）和新的键盘控制器（Intel 8042）之前的PPI不再是主板的一部分。<br>控制器使用2个缓冲区来处理数据，一个用来接受来自设备的数据，这个数据OS将过来读取，另一个是OS写入，然后发送给PS/2设备。命名是从设备角度出发的，比如输出缓冲是设备输出的数据（软件读取），输入缓冲是设备的输入（软件发送过来的数据）。</p>
 <h4 id="USB兼容支持"><a href="#USB兼容支持" class="headerlink" title="USB兼容支持"></a>USB兼容支持</h4><p>// TODO: 补充此部分</p>
-<h4 id="IO端口"><a href="#IO端口" class="headerlink" title="IO端口"></a>IO端口</h4><p>PS/2控制器使用2个IO端口（0x60和0x64），读写过程可能会访问不同的内部寄存器。<br>|IO Port| Access Type| Purpose|<br>|——|——|——|<br>|0x60| Read/Write|数据端口|<br>|0x64|Read|状态寄存器|<br>|0x64|Write|命令寄存器|</p>
+<h4 id="IO端口"><a href="#IO端口" class="headerlink" title="IO端口"></a>IO端口</h4><p>PS/2控制器使用2个IO端口（0x60和0x64），读写过程可能会访问不同的内部寄存器。</p>
+<table>
+<thead>
+<tr>
+<th>IO Port</th>
+<th>Access Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x60</td>
+<td>Read/Write</td>
+<td>数据端口</td>
+</tr>
+<tr>
+<td>0x64</td>
+<td>Read</td>
+<td>状态寄存器</td>
+</tr>
+<tr>
+<td>0x64</td>
+<td>Write</td>
+<td>命令寄存器</td>
+</tr>
+</tbody>
+</table>
 <h5 id="数据端口"><a href="#数据端口" class="headerlink" title="数据端口"></a>数据端口</h5><p>数据端口（IO端口0x60）接收或写入PS/2设备或PS/2控制器自己的数据。</p>
-<h5 id="状态寄存器"><a href="#状态寄存器" class="headerlink" title="状态寄存器"></a>状态寄存器</h5><p>状态寄存器包含表明PS/2控制器状态的很多flag，如下：<br>|Bit|Information|<br>|—|—————-|<br>|0|输出缓冲状态（0为空，1为满）|<br>|1|输入缓冲状态（0为空，1为满）|<br>|2|系统flag，通过自检后设置此位|<br>|3| |<br>|4|未知|<br>|5|未知|<br>|6|超时错误（1发生错误）|<br>|7|校验错误（1发生错误）|</p>
+<h5 id="状态寄存器"><a href="#状态寄存器" class="headerlink" title="状态寄存器"></a>状态寄存器</h5><p>状态寄存器包含表明PS/2控制器状态的很多flag，如下：</p>
+<table>
+<thead>
+<tr>
+<th>Bit</th>
+<th>Information</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>输出缓冲状态（0为空，1为满）</td>
+</tr>
+<tr>
+<td>1</td>
+<td>输入缓冲状态（0为空，1为满）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>系统flag，通过自检后设置此位</td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td>未知</td>
+</tr>
+<tr>
+<td>5</td>
+<td>未知</td>
+</tr>
+<tr>
+<td>6</td>
+<td>超时错误（1发生错误）</td>
+</tr>
+<tr>
+<td>7</td>
+<td>校验错误（1发生错误）</td>
+</tr>
+</tbody>
+</table>
 <h5 id="命令寄存器"><a href="#命令寄存器" class="headerlink" title="命令寄存器"></a>命令寄存器</h5><p>命令端口（IO端口0x64）用于发送命令给PS/2控制器（不是PS/2设备），具体见下。</p>
 <h4 id="PS-2控制命令"><a href="#PS-2控制命令" class="headerlink" title="PS/2控制命令"></a>PS/2控制命令</h4><p>PS/2控制器接收并执行命令，这些命令不应与发送到PS/2设备的命令混淆。发送给控制器命令是通过向IO端口0x64写命令字节完成的，如果有第二个字节（命令有两个字节的情况）那么第二个字节写到0x60。写命令之前要确保控制器已经准备好接收命令（状态寄存器位1是0）。如果有回复字节信息，那么应该从IO端口0x60来读取（此时状态寄存器的位0应该被置位）。具体的命令参考<a href></a>。</p>
-<h5 id="PS-2控制器配置字节"><a href="#PS-2控制器配置字节" class="headerlink" title="PS/2控制器配置字节"></a>PS/2控制器配置字节</h5><p>命令0x20和0x60可以读写PS/2控制器的配置，其具体每一位含义如下：<br>|Bit|Information|<br>|—-|——-|<br>|0|第一个PS/2端口中断接收（1开启，0关闭）|<br>|1|第二个PS/2端口中断接收（1开启，0关闭）|<br>|2|系统flag，通过自检为1，否则0|<br>|3|0|<br>|4|第一个PS/2端口时钟脉冲1关闭，0开启|<br>|5|第二个PS/2端口时钟脉冲1关闭，0开启|<br>|6|第一个PS/2端口开启转换1开启，0关闭|<br>|7|0|</p>
+<h5 id="PS-2控制器配置字节"><a href="#PS-2控制器配置字节" class="headerlink" title="PS/2控制器配置字节"></a>PS/2控制器配置字节</h5><p>命令0x20和0x60可以读写PS/2控制器的配置，其具体每一位含义如下：</p>
+<table>
+<thead>
+<tr>
+<th>Bit</th>
+<th>Information</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>第一个PS/2端口中断接收（1开启，0关闭）</td>
+</tr>
+<tr>
+<td>1</td>
+<td>第二个PS/2端口中断接收（1开启，0关闭）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>系统flag，通过自检为1，否则0</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0</td>
+</tr>
+<tr>
+<td>4</td>
+<td>第一个PS/2端口时钟脉冲1关闭，0开启</td>
+</tr>
+<tr>
+<td>5</td>
+<td>第二个PS/2端口时钟脉冲1关闭，0开启</td>
+</tr>
+<tr>
+<td>6</td>
+<td>第一个PS/2端口开启转换1开启，0关闭</td>
+</tr>
+<tr>
+<td>7</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
 <h5 id="PS-2控制器输出端口"><a href="#PS-2控制器输出端口" class="headerlink" title="PS/2控制器输出端口"></a>PS/2控制器输出端口</h5><h4 id="初始化过程"><a href="#初始化过程" class="headerlink" title="初始化过程"></a>初始化过程</h4><h5 id="初始化USB控制器"><a href="#初始化USB控制器" class="headerlink" title="初始化USB控制器"></a>初始化USB控制器</h5><p>这一步与PS/2控制器、PS/2设备没啥关系，主要是有些系统使用USB传统支持（通常是受限的）可能会和PS/2控制器的初始化冲突，因此需要先初始化USB控制器并禁用USB传统支持。</p>
 <h5 id="检查PS-2控制器是否存在"><a href="#检查PS-2控制器是否存在" class="headerlink" title="检查PS/2控制器是否存在"></a>检查PS/2控制器是否存在</h5><p>在操作PS/2控制器之前，要先确定它是否存在，方法是通过ACPI，检查Fixed ACPI描述表（FADT）中偏移量为109的“IA PC Boot Architecture Flags”域的位1（第二位，8042flag），如果这一位没有设置，那么没有PS/2控制器，如果这一位设置了，或者不支持ACPI（没有ACPI表和FADT），那么PS/2控制器是存在的。</p>
 <h5 id="禁用设备"><a href="#禁用设备" class="headerlink" title="禁用设备"></a>禁用设备</h5><p>在初始化过程中，我们总是想禁止PS/2的输入，以防止干扰初始化过程，方法是给PS/2控制器发送0xAD和0xA7，如果设备是单通道设备，那么0xA7将会被忽略掉。</p>
@@ -529,12 +639,166 @@
 <li>等待设备回复0xFA</li>
 <li>发送“身份识别”命令0xF2给设备</li>
 <li>等待设备回复0xFA</li>
-<li>等待设备最多回复2个字节的内容，用超时来结束等待（应为有些只会回复一个字节），下边是可能回复的字节及对应的设备类型<br>  | Byte(s)                | Type                                 |<br>  | :—–:                | :–:                                 |<br>  | None                   | 转换开启的AT键盘，第二个PS/2端口不可能使用 |<br>  | 0x00                   | 标准PS/2鼠标                          |<br>  | 0x03                   | 带滚轮的鼠标                           |<br>  | 0x04                   | 5键鼠标                               |<br>  | 0xAB, 0x41或0xAB, 0xC1 | 开启转换的MF2键盘，第二个PS/2端口不可能使用|<br>  | 0xAB,0x83              | MF2键盘                              |</li>
+<li><p>等待设备最多回复2个字节的内容，用超时来结束等待（应为有些只会回复一个字节），下边是可能回复的字节及对应的设备类型</p>
+<p>  | Byte(s)                | Type                                 |<br>  | :—–:                | :–:                                 |<br>  | None                   | 转换开启的AT键盘，第二个PS/2端口不可能使用 |<br>  | 0x00                   | 标准PS/2鼠标                          |<br>  | 0x03                   | 带滚轮的鼠标                           |<br>  | 0x04                   | 5键鼠标                               |<br>  | 0xAB, 0x41或0xAB, 0xC1 | 开启转换的MF2键盘，第二个PS/2端口不可能使用|<br>  | 0xAB,0x83              | MF2键盘                              |</p>
+</li>
 </ul>
 <p>在获取到设备类型后，别忘记取消“禁用扫描”功能。</p>
 <h3 id="PS-2键盘"><a href="#PS-2键盘" class="headerlink" title="PS/2键盘"></a>PS/2键盘</h3><p>PS/2键盘是使用串行通信与PS/2控制器通信的设备，理想情况下每种PS/2控制驱动程序都会提供标准的发送接收接口，而不用关心更底层的细节。PS/2键盘接收命令并发送命令的响应，还会发送按键或释放键的扫描码，然后PS/2控制器可能会改变（即转换）这些扫描码的信息，具体取决于控制器的设置。</p>
-<h4 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h4><p>PS/2键盘可以接收很多类型的命令，命令为1个字节，某些命令的数据字节必须在命令发送之后再发送。键盘通常会发送”ACK”或“Resend”来表明接收是否成功。下边是具体的命令信息：<br>|命令字节|数据字节|含义|响应|<br>|——|——|——|——|<br>|0xED|0：滚动锁，1：小键盘锁，2，大写锁定|设置LED灯|0xFA（ACK）或0xFE（重新发送）|<br>|0xEE|无|回声（用于诊断，例如设备删除检测）|0xEE（回声）或0xFE（重新发送）|<br>|0xF0|0：获取当前扫描码集，1：设置扫描码集<br> 2：设置扫描码集2，3：设置扫描码集3|获取设置扫描码集|0xFA（ACK）或0xFE（重新发送）|<br>|0xF2|无|识别键盘|0xFA（ACK）后跟一个或多个字节，具体内容见上文“检测PS/2设备类型”|<br>|0xF3|0-4：重复速率（00000b=30Hz…11111b=2Hz）<br> 5-6：重复前延迟时间00b=250ms,01b=500ms,10b=750ms,11b=1000ms）<br> 7：必须为0|设置按键速度和延迟|0xFA（ACK）或0xFE（重新发送）|<br>|0xF4|无|启用扫描（键盘将发送扫描码）|0xFA（ACK）或0xFE（重新发送）|<br>|0xF5|无|禁用扫描（键盘将不发送扫描码）注意：也可以恢复默认参数|0xFA（ACK）或0xFE（重新发送）|<br>|0xF6|无|设置默认参数|0xFA（ACK）或0xFE（重新发送）|<br>|0xF7|无|将所有键设置为仅typematic/autorepeat（仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xF8|无|设置所有按键为make/release（仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xF9|无|将所有键设置为仅make（仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xFA|无|将所有键设置为typematic/autorepeat/make/release（仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xFB|密钥扫描码|将特定键设置为仅typematic/autorepeat （仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xFC|密钥扫描码|设置特定按键make/release（仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xFD|密钥扫描码|将特定键设置为仅make （仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xFE|无|重新发送最后一个字节|先前发送的字节或0xFE（重新发送）|<br>|0xFF|无|重置并开始自检|0xAA（自检通过），0xFC或0xFD（自检失败）或0xFE（重新发送）|</p>
-<h4 id="特殊字节"><a href="#特殊字节" class="headerlink" title="特殊字节"></a>特殊字节</h4><p>键盘发送给系统的字节，有些有特殊的含义，如下：<br>|发送的字节|含义|<br>|———|—–|<br>|0x00|按键发生错误或内部缓冲区超限|<br>|0xAA|自检通过（在接收到0xFF后或系统上电后）|<br>|0xEE|回应回声命令（OXEE）|<br>|0xFA|命令确认（ACK）|<br>|0xFC和0xFD|自检失败（在接收到0xFF后或系统上电后）|<br>|0xFE|重新发送（键盘希望控制器重复发送最后一条命令）|<br>|0xFF|按键发生错误或内部缓冲区超限|</p>
+<h4 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h4><p>PS/2键盘可以接收很多类型的命令，命令为1个字节，某些命令的数据字节必须在命令发送之后再发送。键盘通常会发送”ACK”或“Resend”来表明接收是否成功。下边是具体的命令信息：</p>
+<table>
+<thead>
+<tr>
+<th>命令字节</th>
+<th>数据字节</th>
+<th>含义</th>
+<th>响应</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0xED</td>
+<td>0：滚动锁，1：小键盘锁，2，大写锁定</td>
+<td>设置LED灯</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xEE</td>
+<td>无</td>
+<td>回声（用于诊断，例如设备删除检测）</td>
+<td>0xEE（回声）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xF0</td>
+<td>0：获取当前扫描码集，1：设置扫描码集<br> 2：设置扫描码集2，3：设置扫描码集3</td>
+<td>获取设置扫描码集</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xF2</td>
+<td>无</td>
+<td>识别键盘</td>
+<td>0xFA（ACK）后跟一个或多个字节，具体内容见上文“检测PS/2设备类型”</td>
+</tr>
+<tr>
+<td>0xF3</td>
+<td>0-4：重复速率（00000b=30Hz…11111b=2Hz）<br> 5-6：重复前延迟时间00b=250ms,01b=500ms,10b=750ms,11b=1000ms）<br> 7：必须为0</td>
+<td>设置按键速度和延迟</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xF4</td>
+<td>无</td>
+<td>启用扫描（键盘将发送扫描码）</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xF5</td>
+<td>无</td>
+<td>禁用扫描（键盘将不发送扫描码）注意：也可以恢复默认参数</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xF6</td>
+<td>无</td>
+<td>设置默认参数</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xF7</td>
+<td>无</td>
+<td>将所有键设置为仅typematic/autorepeat（仅扫描码集3）</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xF8</td>
+<td>无</td>
+<td>设置所有按键为make/release（仅扫描码集3）</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xF9</td>
+<td>无</td>
+<td>将所有键设置为仅make（仅扫描码集3）</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xFA</td>
+<td>无</td>
+<td>将所有键设置为typematic/autorepeat/make/release（仅扫描码集3）</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xFB</td>
+<td>密钥扫描码</td>
+<td>将特定键设置为仅typematic/autorepeat （仅扫描码集3）</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xFC</td>
+<td>密钥扫描码</td>
+<td>设置特定按键make/release（仅扫描码集3）</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xFD</td>
+<td>密钥扫描码</td>
+<td>将特定键设置为仅make （仅扫描码集3）</td>
+<td>0xFA（ACK）或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xFE</td>
+<td>无</td>
+<td>重新发送最后一个字节</td>
+<td>先前发送的字节或0xFE（重新发送）</td>
+</tr>
+<tr>
+<td>0xFF</td>
+<td>无</td>
+<td>重置并开始自检</td>
+<td>0xAA（自检通过），0xFC或0xFD（自检失败）或0xFE（重新发送）</td>
+</tr>
+</tbody>
+</table>
+<h4 id="特殊字节"><a href="#特殊字节" class="headerlink" title="特殊字节"></a>特殊字节</h4><p>键盘发送给系统的字节，有些有特殊的含义，如下：</p>
+<table>
+<thead>
+<tr>
+<th>发送的字节</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x00</td>
+<td>按键发生错误或内部缓冲区超限</td>
+</tr>
+<tr>
+<td>0xAA</td>
+<td>自检通过（在接收到0xFF后或系统上电后）</td>
+</tr>
+<tr>
+<td>0xEE</td>
+<td>回应回声命令（OXEE）</td>
+</tr>
+<tr>
+<td>0xFA</td>
+<td>命令确认（ACK）</td>
+</tr>
+<tr>
+<td>0xFC和0xFD</td>
+<td>自检失败（在接收到0xFF后或系统上电后）</td>
+</tr>
+<tr>
+<td>0xFE</td>
+<td>重新发送（键盘希望控制器重复发送最后一条命令）</td>
+</tr>
+<tr>
+<td>0xFF</td>
+<td>按键发生错误或内部缓冲区超限</td>
+</tr>
+</tbody>
+</table>
 <p>键盘发送的其他所有字节均为扫描码，其解释取决于当前选择的扫描码集。</p>
 <h4 id="驱动模型"><a href="#驱动模型" class="headerlink" title="驱动模型"></a>驱动模型</h4><h5 id="命令队列和状态机"><a href="#命令队列和状态机" class="headerlink" title="命令队列和状态机"></a>命令队列和状态机</h5><p>命令必须一次发送一个，例如如果驱动程序是中断驱动的，那么将无法在IRQ处理过程中再发送命令，因为IRQ处理程序外的代码可能会在发送的多条命令之间。在收到ACK之前，过程不会完成。有些场景可能会一次发送多个命令，比如初始化函数，可能会设置扫描码集，设置LED等。应对这种场景最简单的方法是使用一个队列，发送命令时，如果队列为空，则放入队尾后直接发送，否则将消息放入队尾，当从键盘收到消息0xFA（ACK）后，删除掉队头的消息，如果收到0xFE（重发），则需要再次发送队头的消息。</p>
 <p>驱动程序的另外部分应该是状态机，在完成某些命令或从键盘收到各种字节后，状态机进入不同的状态。例如驱动程序正处在默认状态，此时收到一个中断代码，该代码会将其置于“接收中断代码后等待扫描代码”的状态，然后它会接收多个字节的扫描码中的第一个字节，然后将状态置于“中断代码后等待第二个字节”的状态，最后可能会收到第二个字节，然后切换会默认状态。</p>
@@ -1018,7 +1282,33 @@
 </tr>
 </tbody>
 </table>
-<p>ACPI扫描码集：<br>|KEY  |MAKE |BREAK|<br>|:–: |:–: |:–: |<br>|Power|E0,5E|E0,DE|<br>|Sleep|E0,5F|E0,DF|<br>|Wake |E0,63|E0,E3|</p>
+<p>ACPI扫描码集：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">KEY</th>
+<th style="text-align:center">MAKE</th>
+<th style="text-align:center">BREAK</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Power</td>
+<td style="text-align:center">E0,5E</td>
+<td style="text-align:center">E0,DE</td>
+</tr>
+<tr>
+<td style="text-align:center">Sleep</td>
+<td style="text-align:center">E0,5F</td>
+<td style="text-align:center">E0,DF</td>
+</tr>
+<tr>
+<td style="text-align:center">Wake</td>
+<td style="text-align:center">E0,63</td>
+<td style="text-align:center">E0,E3</td>
+</tr>
+</tbody>
+</table>
 <h5 id="扫描码集2"><a href="#扫描码集2" class="headerlink" title="扫描码集2"></a>扫描码集2</h5><table>
 <thead>
 <tr>
