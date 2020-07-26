@@ -105,15 +105,18 @@
 
 
 
-  <meta name="keywords" content="键盘">
+  <meta name="description" content="这篇支持下PS/2键盘输入，PS/2控制器位于主板上，通常被称为键盘控制器，硬件原理不过多关注，主要说下如何从软件角度适配一个标准键盘。">
+<meta name="keywords" content="键盘">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Keyboard">
 <meta property="og:url" content="https://blog.inlow.online/2020/07/11/Keyboard/index.html">
 <meta property="og:site_name" content="INLOW开发博客">
+<meta property="og:description" content="这篇支持下PS/2键盘输入，PS/2控制器位于主板上，通常被称为键盘控制器，硬件原理不过多关注，主要说下如何从软件角度适配一个标准键盘。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-07-11T05:18:00.755Z">
+<meta property="og:updated_time" content="2020-07-26T10:12:22.719Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Keyboard">
+<meta name="twitter:description" content="这篇支持下PS/2键盘输入，PS/2控制器位于主板上，通常被称为键盘控制器，硬件原理不过多关注，主要说下如何从软件角度适配一个标准键盘。">
 
 
 
@@ -381,12 +384,24 @@
                 
               
 
-              <time title="创建时间：2020-07-11 13:14:29 / 修改时间：13:18:00" itemprop="dateCreated datePublished" datetime="2020-07-11T13:14:29+08:00">2020-07-11</time>
+              <time title="创建时间：2020-07-11 13:14:29" itemprop="dateCreated datePublished" datetime="2020-07-11T13:14:29+08:00">2020-07-11</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-07-26 18:12:22" itemprop="dateModified" datetime="2020-07-26T18:12:22+08:00">2020-07-26</time>
               
             
           </span>
@@ -455,7 +470,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">0</span>
+                <span title="本文字数">8.8k</span>
               
 
               
@@ -469,7 +484,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">1 分钟</span>
+                <span title="阅读时长">22 分钟</span>
               
             </div>
           
@@ -489,7 +504,996 @@
       
 
       
-        
+        <p>这篇支持下PS/2键盘输入，PS/2控制器位于主板上，通常被称为键盘控制器，硬件原理不过多关注，主要说下如何从软件角度适配一个标准键盘。</p>
+<a id="more"></a>
+<h3 id="PS-2控制器"><a href="#PS-2控制器" class="headerlink" title="PS/2控制器"></a>PS/2控制器</h3><h4 id="历史"><a href="#历史" class="headerlink" title="历史"></a>历史</h4><p>在Intel 8048年代，IBM使用多功能PPI控制原始的单向、单通道外围设备，连接PC-XT键盘接口，在后来的PC-AT中，IBM引入了新键盘（带有新的双向协议）和新的键盘控制器（Intel 8042）之前的PPI不再是主板的一部分。<br>控制器使用2个缓冲区来处理数据，一个用来接受来自设备的数据，这个数据OS将过来读取，另一个是OS写入，然后发送给PS/2设备。命名是从设备角度出发的，比如输出缓冲是设备输出的数据（软件读取），输入缓冲是设备的输入（软件发送过来的数据）。</p>
+<h4 id="USB兼容支持"><a href="#USB兼容支持" class="headerlink" title="USB兼容支持"></a>USB兼容支持</h4><p>// TODO: 补充此部分</p>
+<h4 id="IO端口"><a href="#IO端口" class="headerlink" title="IO端口"></a>IO端口</h4><p>PS/2控制器使用2个IO端口（0x60和0x64），读写过程可能会访问不同的内部寄存器。<br>|IO Port| Access Type| Purpose|<br>|——|——|——|<br>|0x60| Read/Write|数据端口|<br>|0x64|Read|状态寄存器|<br>|0x64|Write|命令寄存器|</p>
+<h5 id="数据端口"><a href="#数据端口" class="headerlink" title="数据端口"></a>数据端口</h5><p>数据端口（IO端口0x60）接收或写入PS/2设备或PS/2控制器自己的数据。</p>
+<h5 id="状态寄存器"><a href="#状态寄存器" class="headerlink" title="状态寄存器"></a>状态寄存器</h5><p>状态寄存器包含表明PS/2控制器状态的很多flag，如下：<br>|Bit|Information|<br>|—|—————-|<br>|0|输出缓冲状态（0为空，1为满）|<br>|1|输入缓冲状态（0为空，1为满）|<br>|2|系统flag，通过自检后设置此位|<br>|3| |<br>|4|未知|<br>|5|未知|<br>|6|超时错误（1发生错误）|<br>|7|校验错误（1发生错误）|</p>
+<h5 id="命令寄存器"><a href="#命令寄存器" class="headerlink" title="命令寄存器"></a>命令寄存器</h5><p>命令端口（IO端口0x64）用于发送命令给PS/2控制器（不是PS/2设备），具体见下。</p>
+<h4 id="PS-2控制命令"><a href="#PS-2控制命令" class="headerlink" title="PS/2控制命令"></a>PS/2控制命令</h4><p>PS/2控制器接收并执行命令，这些命令不应与发送到PS/2设备的命令混淆。发送给控制器命令是通过向IO端口0x64写命令字节完成的，如果有第二个字节（命令有两个字节的情况）那么第二个字节写到0x60。写命令之前要确保控制器已经准备好接收命令（状态寄存器位1是0）。如果有回复字节信息，那么应该从IO端口0x60来读取（此时状态寄存器的位0应该被置位）。具体的命令参考<a href></a>。</p>
+<h5 id="PS-2控制器配置字节"><a href="#PS-2控制器配置字节" class="headerlink" title="PS/2控制器配置字节"></a>PS/2控制器配置字节</h5><p>命令0x20和0x60可以读写PS/2控制器的配置，其具体每一位含义如下：<br>|Bit|Information|<br>|—-|——-|<br>|0|第一个PS/2端口中断接收（1开启，0关闭）|<br>|1|第二个PS/2端口中断接收（1开启，0关闭）|<br>|2|系统flag，通过自检为1，否则0|<br>|3|0|<br>|4|第一个PS/2端口时钟脉冲1关闭，0开启|<br>|5|第二个PS/2端口时钟脉冲1关闭，0开启|<br>|6|第一个PS/2端口开启转换1开启，0关闭|<br>|7|0|</p>
+<h5 id="PS-2控制器输出端口"><a href="#PS-2控制器输出端口" class="headerlink" title="PS/2控制器输出端口"></a>PS/2控制器输出端口</h5><h4 id="初始化过程"><a href="#初始化过程" class="headerlink" title="初始化过程"></a>初始化过程</h4><h5 id="初始化USB控制器"><a href="#初始化USB控制器" class="headerlink" title="初始化USB控制器"></a>初始化USB控制器</h5><p>这一步与PS/2控制器、PS/2设备没啥关系，主要是有些系统使用USB传统支持（通常是受限的）可能会和PS/2控制器的初始化冲突，因此需要先初始化USB控制器并禁用USB传统支持。</p>
+<h5 id="检查PS-2控制器是否存在"><a href="#检查PS-2控制器是否存在" class="headerlink" title="检查PS/2控制器是否存在"></a>检查PS/2控制器是否存在</h5><p>在操作PS/2控制器之前，要先确定它是否存在，方法是通过ACPI，检查Fixed ACPI描述表（FADT）中偏移量为109的“IA PC Boot Architecture Flags”域的位1（第二位，8042flag），如果这一位没有设置，那么没有PS/2控制器，如果这一位设置了，或者不支持ACPI（没有ACPI表和FADT），那么PS/2控制器是存在的。</p>
+<h5 id="禁用设备"><a href="#禁用设备" class="headerlink" title="禁用设备"></a>禁用设备</h5><p>在初始化过程中，我们总是想禁止PS/2的输入，以防止干扰初始化过程，方法是给PS/2控制器发送0xAD和0xA7，如果设备是单通道设备，那么0xA7将会被忽略掉。</p>
+<h5 id="刷新输出缓存"><a href="#刷新输出缓存" class="headerlink" title="刷新输出缓存"></a>刷新输出缓存</h5><p>有时（比如在初始化中断过程中会丢失IRQ）数据会卡在PS/2控制器的输出缓存中，为了解决这个问题，刷新输出缓冲区是个办法，有两个方法可以，轮询状态寄存器的位0（当位0被设置时，从0x60端口读取）或者直接读取IO端口0x60而不检测位0.</p>
+<h5 id="配置控制器"><a href="#配置控制器" class="headerlink" title="配置控制器"></a>配置控制器</h5><p>因为控制器的一些配置位为“未知”，这需要我们读取旧的配置信息（0x20），修改后再写入配置（发送给0x60），你可能想禁用IRQ和转换（清除位0和6）。在获取到配置信息后，应该判断位5是否被设置，如果没有，那么可以判定这个PS/2控制器不是双通道。</p>
+<h5 id="控制器自检"><a href="#控制器自检" class="headerlink" title="控制器自检"></a>控制器自检</h5><p>控制器自检是向控制器发送0xAA，然后等待回应，如果返回0x55，那么自检成功。这可能会重置配置位，所以要自己保证配置生效。</p>
+<h5 id="确定是否有两个通道"><a href="#确定是否有两个通道" class="headerlink" title="确定是否有两个通道"></a>确定是否有两个通道</h5><p>如果在步骤5中判断是单通道，那么这一步跳过，否则发送0xA8来使能第二个PS/2端口并再次读取控制器配置位。</p>
+<h5 id="接口自检"><a href="#接口自检" class="headerlink" title="接口自检"></a>接口自检</h5><p>这一步是PS/2端口的检测，使用命令0xAB来检测第一个PS/2端口，如果是双通道，那么发送0xA9来检测第二个端口。</p>
+<h5 id="设备使能"><a href="#设备使能" class="headerlink" title="设备使能"></a>设备使能</h5><p>使用命令0xAE（用于第一个端口）和命令0xA8（用于第二个端口），启用存在的所有PS/2端口。如果使用的是IRQ（推荐），在控制器配置字节中为所有可用的PS/2端口启用中断（第一个PS/2端口设置为0，第二个PS/2设置为1），然后使用命令0x60进行设置）。</p>
+<h5 id="复位设备"><a href="#复位设备" class="headerlink" title="复位设备"></a>复位设备</h5><h4 id="检测PS-2设备类型"><a href="#检测PS-2设备类型" class="headerlink" title="检测PS/2设备类型"></a>检测PS/2设备类型</h4><p>所有的PS/2设备都支持“身份识别”命令和“禁用扫描”命令（这属于设备的命令不是控制器的命令）。在给设备发送“身份识别”命令后，设备应回复一个或两个字节的空序列，然而，如果此时键盘或鼠标正好在发送其他数据那么就会产生混乱，最好的办法就是禁用扫描，禁用扫描也就是忽略用户的输入例如键盘按键被按下，鼠标移动等。具体操作如下：</p>
+<ul>
+<li>发送“禁用扫描”命令0xF5给设备</li>
+<li>等待设备回复0xFA</li>
+<li>发送“身份识别”命令0xF2给设备</li>
+<li>等待设备回复0xFA</li>
+<li>等待设备最多回复2个字节的内容，用超时来结束等待（应为有些只会回复一个字节），下边是可能回复的字节及对应的设备类型<br>  | Byte(s)                | Type                                 |<br>  | :—–:                | :–:                                 |<br>  | None                   | 转换开启的AT键盘，第二个PS/2端口不可能使用 |<br>  | 0x00                   | 标准PS/2鼠标                          |<br>  | 0x03                   | 带滚轮的鼠标                           |<br>  | 0x04                   | 5键鼠标                               |<br>  | 0xAB, 0x41或0xAB, 0xC1 | 开启转换的MF2键盘，第二个PS/2端口不可能使用|<br>  | 0xAB,0x83              | MF2键盘                              |</li>
+</ul>
+<p>在获取到设备类型后，别忘记取消“禁用扫描”功能。</p>
+<h3 id="PS-2键盘"><a href="#PS-2键盘" class="headerlink" title="PS/2键盘"></a>PS/2键盘</h3><p>PS/2键盘是使用串行通信与PS/2控制器通信的设备，理想情况下每种PS/2控制驱动程序都会提供标准的发送接收接口，而不用关心更底层的细节。PS/2键盘接收命令并发送命令的响应，还会发送按键或释放键的扫描码，然后PS/2控制器可能会改变（即转换）这些扫描码的信息，具体取决于控制器的设置。</p>
+<h4 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h4><p>PS/2键盘可以接收很多类型的命令，命令为1个字节，某些命令的数据字节必须在命令发送之后再发送。键盘通常会发送”ACK”或“Resend”来表明接收是否成功。下边是具体的命令信息：<br>|命令字节|数据字节|含义|响应|<br>|——|——|——|——|<br>|0xED|0：滚动锁，1：小键盘锁，2，大写锁定|设置LED灯|0xFA（ACK）或0xFE（重新发送）|<br>|0xEE|无|回声（用于诊断，例如设备删除检测）|0xEE（回声）或0xFE（重新发送）|<br>|0xF0|0：获取当前扫描码集，1：设置扫描码集<br> 2：设置扫描码集2，3：设置扫描码集3|获取设置扫描码集|0xFA（ACK）或0xFE（重新发送）|<br>|0xF2|无|识别键盘|0xFA（ACK）后跟一个或多个字节，具体内容见上文“检测PS/2设备类型”|<br>|0xF3|0-4：重复速率（00000b=30Hz…11111b=2Hz）<br> 5-6：重复前延迟时间00b=250ms,01b=500ms,10b=750ms,11b=1000ms）<br> 7：必须为0|设置按键速度和延迟|0xFA（ACK）或0xFE（重新发送）|<br>|0xF4|无|启用扫描（键盘将发送扫描码）|0xFA（ACK）或0xFE（重新发送）|<br>|0xF5|无|禁用扫描（键盘将不发送扫描码）注意：也可以恢复默认参数|0xFA（ACK）或0xFE（重新发送）|<br>|0xF6|无|设置默认参数|0xFA（ACK）或0xFE（重新发送）|<br>|0xF7|无|将所有键设置为仅typematic/autorepeat（仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xF8|无|设置所有按键为make/release（仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xF9|无|将所有键设置为仅make（仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xFA|无|将所有键设置为typematic/autorepeat/make/release（仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xFB|密钥扫描码|将特定键设置为仅typematic/autorepeat （仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xFC|密钥扫描码|设置特定按键make/release（仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xFD|密钥扫描码|将特定键设置为仅make （仅扫描码集3）|0xFA（ACK）或0xFE（重新发送）|<br>|0xFE|无|重新发送最后一个字节|先前发送的字节或0xFE（重新发送）|<br>|0xFF|无|重置并开始自检|0xAA（自检通过），0xFC或0xFD（自检失败）或0xFE（重新发送）|</p>
+<h4 id="特殊字节"><a href="#特殊字节" class="headerlink" title="特殊字节"></a>特殊字节</h4><p>键盘发送给系统的字节，有些有特殊的含义，如下：<br>|发送的字节|含义|<br>|———|—–|<br>|0x00|按键发生错误或内部缓冲区超限|<br>|0xAA|自检通过（在接收到0xFF后或系统上电后）|<br>|0xEE|回应回声命令（OXEE）|<br>|0xFA|命令确认（ACK）|<br>|0xFC和0xFD|自检失败（在接收到0xFF后或系统上电后）|<br>|0xFE|重新发送（键盘希望控制器重复发送最后一条命令）|<br>|0xFF|按键发生错误或内部缓冲区超限|</p>
+<p>键盘发送的其他所有字节均为扫描码，其解释取决于当前选择的扫描码集。</p>
+<h4 id="驱动模型"><a href="#驱动模型" class="headerlink" title="驱动模型"></a>驱动模型</h4><h5 id="命令队列和状态机"><a href="#命令队列和状态机" class="headerlink" title="命令队列和状态机"></a>命令队列和状态机</h5><p>命令必须一次发送一个，例如如果驱动程序是中断驱动的，那么将无法在IRQ处理过程中再发送命令，因为IRQ处理程序外的代码可能会在发送的多条命令之间。在收到ACK之前，过程不会完成。有些场景可能会一次发送多个命令，比如初始化函数，可能会设置扫描码集，设置LED等。应对这种场景最简单的方法是使用一个队列，发送命令时，如果队列为空，则放入队尾后直接发送，否则将消息放入队尾，当从键盘收到消息0xFA（ACK）后，删除掉队头的消息，如果收到0xFE（重发），则需要再次发送队头的消息。</p>
+<p>驱动程序的另外部分应该是状态机，在完成某些命令或从键盘收到各种字节后，状态机进入不同的状态。例如驱动程序正处在默认状态，此时收到一个中断代码，该代码会将其置于“接收中断代码后等待扫描代码”的状态，然后它会接收多个字节的扫描码中的第一个字节，然后将状态置于“中断代码后等待第二个字节”的状态，最后可能会收到第二个字节，然后切换会默认状态。</p>
+<h5 id="扫描码集，扫描码，键码"><a href="#扫描码集，扫描码，键码" class="headerlink" title="扫描码集，扫描码，键码"></a>扫描码集，扫描码，键码</h5><p>扫描码集是确定何时按下、重复、释放按键的一组代码，共有三种不同的扫描码集，从老到新依次为扫描码集1、扫描码集2、扫描码集3，通常PC兼容系统键盘默认使用的是扫描码集1。</p>
+<p>扫描码本身是一个或多个字节的序列，例如在扫描码集1中的暂停/中断键会使用6个字节（分别是0xE1、0x1D、0x45、0xE1、0x9D，0xC5），这种形式不容易处理，一般是想转成一个整数表示的形式，这样更容易处理。</p>
+<p>键码没有什么标准，这是我们需要为自己OS发明的东西，具体设计稍后再“INWOX支持”节再说。</p>
+<p>驱动本质就是将扫描码通过扫描码集规定的规则转换成键码，然后再交由其他程序处理的过程。</p>
+<h4 id="扫描码集"><a href="#扫描码集" class="headerlink" title="扫描码集"></a>扫描码集</h4><p>由于存在三种不同的扫描码集，因此需要三个表来保存这些信息。</p>
+<p>扫描码集中保存了一些随时间可能增加的键，一些已成相对标准的按键，如下：<br>|标签|含义|<br>|—–|——|<br>|keypad|数字键盘上的按键|<br>|ACPI|通常键盘顶部的一些ACPI组的功能键（这个ACPI和高级配置与电源接口毫无关系，只是普通按键）|<br>|multimedia|作为多媒体控制的键，如音量控制、暂停播放等|</p>
+<h5 id="扫描码集1"><a href="#扫描码集1" class="headerlink" title="扫描码集1"></a>扫描码集1</h5><table>
+<thead>
+<tr>
+<th style="text-align:center">KEY</th>
+<th style="text-align:center">MAKE</th>
+<th style="text-align:center">BREAK</th>
+<th style="text-align:center">—–</th>
+<th style="text-align:center">KEY</th>
+<th style="text-align:center">MAKE</th>
+<th style="text-align:center">BREAK</th>
+<th style="text-align:center">—–</th>
+<th style="text-align:center">KEY</th>
+<th style="text-align:center">MAKE</th>
+<th style="text-align:center">BREAK</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">A</td>
+<td style="text-align:center">1E</td>
+<td style="text-align:center">9E</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">9</td>
+<td style="text-align:center">0A</td>
+<td style="text-align:center">8A</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">[</td>
+<td style="text-align:center">1A</td>
+<td style="text-align:center">9A</td>
+</tr>
+<tr>
+<td style="text-align:center">B</td>
+<td style="text-align:center">30</td>
+<td style="text-align:center">B0</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">`</td>
+<td style="text-align:center">29</td>
+<td style="text-align:center">89</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">INSERT</td>
+<td style="text-align:center">E0,52</td>
+<td style="text-align:center">E0,D2</td>
+</tr>
+<tr>
+<td style="text-align:center">C</td>
+<td style="text-align:center">2E</td>
+<td style="text-align:center">AE</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">0C</td>
+<td style="text-align:center">8C</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">HOME</td>
+<td style="text-align:center">E0,47</td>
+<td style="text-align:center">E0,97</td>
+</tr>
+<tr>
+<td style="text-align:center">D</td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">A0</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">=</td>
+<td style="text-align:center">0D</td>
+<td style="text-align:center">8D</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">PG UP</td>
+<td style="text-align:center">E0,49</td>
+<td style="text-align:center">E0,C9</td>
+</tr>
+<tr>
+<td style="text-align:center">E</td>
+<td style="text-align:center">12</td>
+<td style="text-align:center">92</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">\</td>
+<td style="text-align:center">2B</td>
+<td style="text-align:center">AB</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">DELETE</td>
+<td style="text-align:center">E0,53</td>
+<td style="text-align:center">E0,D3</td>
+</tr>
+<tr>
+<td style="text-align:center">F</td>
+<td style="text-align:center">21</td>
+<td style="text-align:center">A1</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">BKSP</td>
+<td style="text-align:center">0E</td>
+<td style="text-align:center">8E</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">END</td>
+<td style="text-align:center">E0,4F</td>
+<td style="text-align:center">E0,CF</td>
+</tr>
+<tr>
+<td style="text-align:center">G</td>
+<td style="text-align:center">22</td>
+<td style="text-align:center">A2</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">SPACE</td>
+<td style="text-align:center">39</td>
+<td style="text-align:center">B9</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">PG DN</td>
+<td style="text-align:center">E0,51</td>
+<td style="text-align:center">E0,D1</td>
+</tr>
+<tr>
+<td style="text-align:center">H</td>
+<td style="text-align:center">23</td>
+<td style="text-align:center">A3</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">TAB</td>
+<td style="text-align:center">0F</td>
+<td style="text-align:center">8F</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">U ARROW</td>
+<td style="text-align:center">E0,48</td>
+<td style="text-align:center">E0,C8</td>
+</tr>
+<tr>
+<td style="text-align:center">I</td>
+<td style="text-align:center">17</td>
+<td style="text-align:center">97</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">CAPS</td>
+<td style="text-align:center">3A</td>
+<td style="text-align:center">BA</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">L ARROW</td>
+<td style="text-align:center">E0,4B</td>
+<td style="text-align:center">E0,CB</td>
+</tr>
+<tr>
+<td style="text-align:center">J</td>
+<td style="text-align:center">24</td>
+<td style="text-align:center">A4</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">L SHFT</td>
+<td style="text-align:center">2A</td>
+<td style="text-align:center">AA</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">D ARROW</td>
+<td style="text-align:center">E0,50</td>
+<td style="text-align:center">E0,D0</td>
+</tr>
+<tr>
+<td style="text-align:center">K</td>
+<td style="text-align:center">25</td>
+<td style="text-align:center">A5</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">L CTRL</td>
+<td style="text-align:center">1D</td>
+<td style="text-align:center">9D</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">R ARROW</td>
+<td style="text-align:center">E0,4D</td>
+<td style="text-align:center">E0,CD</td>
+</tr>
+<tr>
+<td style="text-align:center">L</td>
+<td style="text-align:center">26</td>
+<td style="text-align:center">A6</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">L WIN</td>
+<td style="text-align:center">E0,5B</td>
+<td style="text-align:center">E0,DB</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">NUM</td>
+<td style="text-align:center">45</td>
+<td style="text-align:center">C5</td>
+</tr>
+<tr>
+<td style="text-align:center">M</td>
+<td style="text-align:center">32</td>
+<td style="text-align:center">B2</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">L ALT</td>
+<td style="text-align:center">38</td>
+<td style="text-align:center">B8</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP /</td>
+<td style="text-align:center">E0,35</td>
+<td style="text-align:center">E0,B5</td>
+</tr>
+<tr>
+<td style="text-align:center">N</td>
+<td style="text-align:center">31</td>
+<td style="text-align:center">B1</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">R SHFT</td>
+<td style="text-align:center">36</td>
+<td style="text-align:center">B6</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP *</td>
+<td style="text-align:center">37</td>
+<td style="text-align:center">B7</td>
+</tr>
+<tr>
+<td style="text-align:center">O</td>
+<td style="text-align:center">18</td>
+<td style="text-align:center">98</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">R CTRL</td>
+<td style="text-align:center">E0,1D</td>
+<td style="text-align:center">E0,9D</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP -</td>
+<td style="text-align:center">4A</td>
+<td style="text-align:center">CA</td>
+</tr>
+<tr>
+<td style="text-align:center">P</td>
+<td style="text-align:center">19</td>
+<td style="text-align:center">99</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">R WIN</td>
+<td style="text-align:center">E0,5C</td>
+<td style="text-align:center">E0,DC</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP +</td>
+<td style="text-align:center">4E</td>
+<td style="text-align:center">CE</td>
+</tr>
+<tr>
+<td style="text-align:center">Q</td>
+<td style="text-align:center">10</td>
+<td style="text-align:center">90</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">R ALT</td>
+<td style="text-align:center">E0,38</td>
+<td style="text-align:center">E0,B8</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP EN</td>
+<td style="text-align:center">E0,1C</td>
+<td style="text-align:center">E0,9C</td>
+</tr>
+<tr>
+<td style="text-align:center">R</td>
+<td style="text-align:center">13</td>
+<td style="text-align:center">93</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">APPS</td>
+<td style="text-align:center">E0,5D</td>
+<td style="text-align:center">E0,DD</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP .</td>
+<td style="text-align:center">53</td>
+<td style="text-align:center">D3</td>
+</tr>
+<tr>
+<td style="text-align:center">S</td>
+<td style="text-align:center">1F</td>
+<td style="text-align:center">9F</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">ENTER</td>
+<td style="text-align:center">1C</td>
+<td style="text-align:center">9C</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 0</td>
+<td style="text-align:center">52</td>
+<td style="text-align:center">D2</td>
+</tr>
+<tr>
+<td style="text-align:center">T</td>
+<td style="text-align:center">14</td>
+<td style="text-align:center">94</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">ESC</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">81</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 1</td>
+<td style="text-align:center">4F</td>
+<td style="text-align:center">CF</td>
+</tr>
+<tr>
+<td style="text-align:center">U</td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">96</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F1</td>
+<td style="text-align:center">3B</td>
+<td style="text-align:center">BB</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 2</td>
+<td style="text-align:center">50</td>
+<td style="text-align:center">D0</td>
+</tr>
+<tr>
+<td style="text-align:center">V</td>
+<td style="text-align:center">2F</td>
+<td style="text-align:center">AF</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F2</td>
+<td style="text-align:center">3C</td>
+<td style="text-align:center">BC</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 3</td>
+<td style="text-align:center">51</td>
+<td style="text-align:center">D1</td>
+</tr>
+<tr>
+<td style="text-align:center">W</td>
+<td style="text-align:center">11</td>
+<td style="text-align:center">91</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F3</td>
+<td style="text-align:center">3D</td>
+<td style="text-align:center">BD</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 4</td>
+<td style="text-align:center">4B</td>
+<td style="text-align:center">CB</td>
+</tr>
+<tr>
+<td style="text-align:center">X</td>
+<td style="text-align:center">2D</td>
+<td style="text-align:center">AD</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F4</td>
+<td style="text-align:center">3E</td>
+<td style="text-align:center">BE</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 5</td>
+<td style="text-align:center">4C</td>
+<td style="text-align:center">CC</td>
+</tr>
+<tr>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">15</td>
+<td style="text-align:center">95</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F5</td>
+<td style="text-align:center">3F</td>
+<td style="text-align:center">BF</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 6</td>
+<td style="text-align:center">4D</td>
+<td style="text-align:center">CD</td>
+</tr>
+<tr>
+<td style="text-align:center">Z</td>
+<td style="text-align:center">2C</td>
+<td style="text-align:center">AC</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F6</td>
+<td style="text-align:center">40</td>
+<td style="text-align:center">C0</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 7</td>
+<td style="text-align:center">47</td>
+<td style="text-align:center">C7</td>
+</tr>
+<tr>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0B</td>
+<td style="text-align:center">8B</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F7</td>
+<td style="text-align:center">41</td>
+<td style="text-align:center">C1</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 8</td>
+<td style="text-align:center">48</td>
+<td style="text-align:center">C8</td>
+</tr>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">82</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F8</td>
+<td style="text-align:center">42</td>
+<td style="text-align:center">C2</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 9</td>
+<td style="text-align:center">49</td>
+<td style="text-align:center">C9</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">83</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F9</td>
+<td style="text-align:center">43</td>
+<td style="text-align:center">C3</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">]</td>
+<td style="text-align:center">1B</td>
+<td style="text-align:center">9B</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">84</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F10</td>
+<td style="text-align:center">44</td>
+<td style="text-align:center">C4</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">;</td>
+<td style="text-align:center">27</td>
+<td style="text-align:center">A7</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center">5</td>
+<td style="text-align:center">85</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F11</td>
+<td style="text-align:center">57</td>
+<td style="text-align:center">D7</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">‘</td>
+<td style="text-align:center">28</td>
+<td style="text-align:center">A8</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center">6</td>
+<td style="text-align:center">86</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F12</td>
+<td style="text-align:center">58</td>
+<td style="text-align:center">D8</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">,</td>
+<td style="text-align:center">33</td>
+<td style="text-align:center">B3</td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center">7</td>
+<td style="text-align:center">87</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">PrtSc</td>
+<td style="text-align:center">E0,2A,E0,37</td>
+<td style="text-align:center">E0,B7,E0,AA</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">.</td>
+<td style="text-align:center">34</td>
+<td style="text-align:center">B4</td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">88</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">SCROLL</td>
+<td style="text-align:center">46</td>
+<td style="text-align:center">C6</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">/</td>
+<td style="text-align:center">35</td>
+<td style="text-align:center">B5</td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:center">9</td>
+<td style="text-align:center">89</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">PAUSE</td>
+<td style="text-align:center">E1,1D,45,E1,9D,C5</td>
+<td style="text-align:center">-NONE-</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+</tbody>
+</table>
+<p>ACPI扫描码集：<br>|KEY  |MAKE |BREAK|<br>|:–: |:–: |:–: |<br>|Power|E0,5E|E0,DE|<br>|Sleep|E0,5F|E0,DF|<br>|Wake |E0,63|E0,E3|</p>
+<h5 id="扫描码集2"><a href="#扫描码集2" class="headerlink" title="扫描码集2"></a>扫描码集2</h5><table>
+<thead>
+<tr>
+<th style="text-align:center">KEY</th>
+<th style="text-align:center">MAKE</th>
+<th style="text-align:center">BREAK</th>
+<th style="text-align:center">—–</th>
+<th style="text-align:center">KEY</th>
+<th style="text-align:center">MAKE</th>
+<th style="text-align:center">BREAK</th>
+<th style="text-align:center">—–</th>
+<th style="text-align:center">KEY</th>
+<th style="text-align:center">MAKE</th>
+<th style="text-align:center">BREAK</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">A</td>
+<td style="text-align:center">1C</td>
+<td style="text-align:center">F0,1C</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">9</td>
+<td style="text-align:center">46</td>
+<td style="text-align:center">F0,46</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">[</td>
+<td style="text-align:center">54</td>
+<td style="text-align:center">FO,54</td>
+</tr>
+<tr>
+<td style="text-align:center">B</td>
+<td style="text-align:center">32</td>
+<td style="text-align:center">F0,32</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">`</td>
+<td style="text-align:center">0E</td>
+<td style="text-align:center">F0,0E</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">INSERT</td>
+<td style="text-align:center">E0,70</td>
+<td style="text-align:center">E0,F0,70</td>
+</tr>
+<tr>
+<td style="text-align:center">C</td>
+<td style="text-align:center">21</td>
+<td style="text-align:center">F0,21</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">4E</td>
+<td style="text-align:center">F0,4E</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">HOME</td>
+<td style="text-align:center">E0,6C</td>
+<td style="text-align:center">E0,F0,6C</td>
+</tr>
+<tr>
+<td style="text-align:center">D</td>
+<td style="text-align:center">23</td>
+<td style="text-align:center">F0,23</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">=</td>
+<td style="text-align:center">55</td>
+<td style="text-align:center">FO,55</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">PG UP</td>
+<td style="text-align:center">E0,7D</td>
+<td style="text-align:center">E0,F0,7D</td>
+</tr>
+<tr>
+<td style="text-align:center">E</td>
+<td style="text-align:center">24</td>
+<td style="text-align:center">F0,24</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">\</td>
+<td style="text-align:center">5D</td>
+<td style="text-align:center">F0,5D</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">DELETE</td>
+<td style="text-align:center">E0,71</td>
+<td style="text-align:center">E0,F0,71</td>
+</tr>
+<tr>
+<td style="text-align:center">F</td>
+<td style="text-align:center">2B</td>
+<td style="text-align:center">F0,2B</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">BKSP</td>
+<td style="text-align:center">66</td>
+<td style="text-align:center">F0,66</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">END</td>
+<td style="text-align:center">E0,69</td>
+<td style="text-align:center">E0,F0,69</td>
+</tr>
+<tr>
+<td style="text-align:center">G</td>
+<td style="text-align:center">34</td>
+<td style="text-align:center">F0,34</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">SPACE</td>
+<td style="text-align:center">29</td>
+<td style="text-align:center">F0,29</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">PG DN</td>
+<td style="text-align:center">E0,7A</td>
+<td style="text-align:center">E0,F0,7A</td>
+</tr>
+<tr>
+<td style="text-align:center">H</td>
+<td style="text-align:center">33</td>
+<td style="text-align:center">F0,33</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">TAB</td>
+<td style="text-align:center">0D</td>
+<td style="text-align:center">F0,0D</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">U ARROW</td>
+<td style="text-align:center">E0,75</td>
+<td style="text-align:center">E0,F0,75</td>
+</tr>
+<tr>
+<td style="text-align:center">I</td>
+<td style="text-align:center">43</td>
+<td style="text-align:center">F0,43</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">CAPS</td>
+<td style="text-align:center">58</td>
+<td style="text-align:center">F0,58</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">L ARROW</td>
+<td style="text-align:center">E0,6B</td>
+<td style="text-align:center">E0,F0,6B</td>
+</tr>
+<tr>
+<td style="text-align:center">J</td>
+<td style="text-align:center">3B</td>
+<td style="text-align:center">F0,3B</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">L SHFT</td>
+<td style="text-align:center">12</td>
+<td style="text-align:center">FO,12</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">D ARROW</td>
+<td style="text-align:center">E0,72</td>
+<td style="text-align:center">E0,F0,72</td>
+</tr>
+<tr>
+<td style="text-align:center">K</td>
+<td style="text-align:center">42</td>
+<td style="text-align:center">F0,42</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">L CTRL</td>
+<td style="text-align:center">14</td>
+<td style="text-align:center">FO,14</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">R ARROW</td>
+<td style="text-align:center">E0,74</td>
+<td style="text-align:center">E0,F0,74</td>
+</tr>
+<tr>
+<td style="text-align:center">L</td>
+<td style="text-align:center">4B</td>
+<td style="text-align:center">F0,4B</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">L WIN</td>
+<td style="text-align:center">E0,1F</td>
+<td style="text-align:center">E0,F0,1F</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">NUM</td>
+<td style="text-align:center">77</td>
+<td style="text-align:center">F0,77</td>
+</tr>
+<tr>
+<td style="text-align:center">M</td>
+<td style="text-align:center">3A</td>
+<td style="text-align:center">F0,3A</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">L ALT</td>
+<td style="text-align:center">11</td>
+<td style="text-align:center">F0,11</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP /</td>
+<td style="text-align:center">E0,4A</td>
+<td style="text-align:center">E0,F0,4A</td>
+</tr>
+<tr>
+<td style="text-align:center">N</td>
+<td style="text-align:center">31</td>
+<td style="text-align:center">F0,31</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">R SHFT</td>
+<td style="text-align:center">59</td>
+<td style="text-align:center">F0,59</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP *</td>
+<td style="text-align:center">7C</td>
+<td style="text-align:center">F0,7C</td>
+</tr>
+<tr>
+<td style="text-align:center">O</td>
+<td style="text-align:center">44</td>
+<td style="text-align:center">F0,44</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">R CTRL</td>
+<td style="text-align:center">E0,14</td>
+<td style="text-align:center">E0,F0,14</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP -</td>
+<td style="text-align:center">7B</td>
+<td style="text-align:center">F0,7B</td>
+</tr>
+<tr>
+<td style="text-align:center">P</td>
+<td style="text-align:center">4D</td>
+<td style="text-align:center">F0,4D</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">R WIN</td>
+<td style="text-align:center">E0,27</td>
+<td style="text-align:center">E0,F0,27</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP +</td>
+<td style="text-align:center">79</td>
+<td style="text-align:center">F0,79</td>
+</tr>
+<tr>
+<td style="text-align:center">Q</td>
+<td style="text-align:center">15</td>
+<td style="text-align:center">F0,15</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">R ALT</td>
+<td style="text-align:center">E0,11</td>
+<td style="text-align:center">E0,F0,11</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP EN</td>
+<td style="text-align:center">E0,5A</td>
+<td style="text-align:center">E0,F0,5A</td>
+</tr>
+<tr>
+<td style="text-align:center">R</td>
+<td style="text-align:center">2D</td>
+<td style="text-align:center">F0,2D</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">APPS</td>
+<td style="text-align:center">E0,2F</td>
+<td style="text-align:center">E0,F0,2F</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP .</td>
+<td style="text-align:center">71</td>
+<td style="text-align:center">F0,71</td>
+</tr>
+<tr>
+<td style="text-align:center">S</td>
+<td style="text-align:center">1B</td>
+<td style="text-align:center">F0,1B</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">ENTER</td>
+<td style="text-align:center">5A</td>
+<td style="text-align:center">F0,5A</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 0</td>
+<td style="text-align:center">70</td>
+<td style="text-align:center">F0,70</td>
+</tr>
+<tr>
+<td style="text-align:center">T</td>
+<td style="text-align:center">2C</td>
+<td style="text-align:center">F0,2C</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">ESC</td>
+<td style="text-align:center">76</td>
+<td style="text-align:center">F0,76</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 1</td>
+<td style="text-align:center">69</td>
+<td style="text-align:center">F0,69</td>
+</tr>
+<tr>
+<td style="text-align:center">U</td>
+<td style="text-align:center">3C</td>
+<td style="text-align:center">F0,3C</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F1</td>
+<td style="text-align:center">5</td>
+<td style="text-align:center">F0,05</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 2</td>
+<td style="text-align:center">72</td>
+<td style="text-align:center">F0,72</td>
+</tr>
+<tr>
+<td style="text-align:center">V</td>
+<td style="text-align:center">2A</td>
+<td style="text-align:center">F0,2A</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F2</td>
+<td style="text-align:center">6</td>
+<td style="text-align:center">F0,06</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 3</td>
+<td style="text-align:center">7A</td>
+<td style="text-align:center">F0,7A</td>
+</tr>
+<tr>
+<td style="text-align:center">W</td>
+<td style="text-align:center">1D</td>
+<td style="text-align:center">F0,1D</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F3</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">F0,04</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 4</td>
+<td style="text-align:center">6B</td>
+<td style="text-align:center">F0,6B</td>
+</tr>
+<tr>
+<td style="text-align:center">X</td>
+<td style="text-align:center">22</td>
+<td style="text-align:center">F0,22</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F4</td>
+<td style="text-align:center">0C</td>
+<td style="text-align:center">F0,0C</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 5</td>
+<td style="text-align:center">73</td>
+<td style="text-align:center">F0,73</td>
+</tr>
+<tr>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">35</td>
+<td style="text-align:center">F0,35</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F5</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">F0,03</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 6</td>
+<td style="text-align:center">74</td>
+<td style="text-align:center">F0,74</td>
+</tr>
+<tr>
+<td style="text-align:center">Z</td>
+<td style="text-align:center">1A</td>
+<td style="text-align:center">F0,1A</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F6</td>
+<td style="text-align:center">0B</td>
+<td style="text-align:center">F0,0B</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 7</td>
+<td style="text-align:center">6C</td>
+<td style="text-align:center">F0,6C</td>
+</tr>
+<tr>
+<td style="text-align:center">0</td>
+<td style="text-align:center">45</td>
+<td style="text-align:center">F0,45</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F7</td>
+<td style="text-align:center">83</td>
+<td style="text-align:center">F0,83</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 8</td>
+<td style="text-align:center">75</td>
+<td style="text-align:center">F0,75</td>
+</tr>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">F0,16</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F8</td>
+<td style="text-align:center">0A</td>
+<td style="text-align:center">F0,0A</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">KP 9</td>
+<td style="text-align:center">7D</td>
+<td style="text-align:center">F0,7D</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1E</td>
+<td style="text-align:center">F0,1E</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F9</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">F0,01</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">]</td>
+<td style="text-align:center">5B</td>
+<td style="text-align:center">F0,5B</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">26</td>
+<td style="text-align:center">F0,26</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F10</td>
+<td style="text-align:center">9</td>
+<td style="text-align:center">F0,09</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">;</td>
+<td style="text-align:center">4C</td>
+<td style="text-align:center">F0,4C</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center">25</td>
+<td style="text-align:center">F0,25</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F11</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">F0,78</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">‘</td>
+<td style="text-align:center">52</td>
+<td style="text-align:center">F0,52</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center">2E</td>
+<td style="text-align:center">F0,2E</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">F12</td>
+<td style="text-align:center">7</td>
+<td style="text-align:center">F0,07</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">,</td>
+<td style="text-align:center">41</td>
+<td style="text-align:center">F0,41</td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center">36</td>
+<td style="text-align:center">F0,36</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">PrtSc</td>
+<td style="text-align:center">E0,12,E0,7C</td>
+<td style="text-align:center">E0,F0,7C,E0,F0,12</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">.</td>
+<td style="text-align:center">49</td>
+<td style="text-align:center">F0,49</td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:center">3D</td>
+<td style="text-align:center">F0,3D</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">SCROLL</td>
+<td style="text-align:center">7E</td>
+<td style="text-align:center">F0,7E</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">/</td>
+<td style="text-align:center">4A</td>
+<td style="text-align:center">F0,4A</td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:center">3E</td>
+<td style="text-align:center">F0,3E</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">PAUSE</td>
+<td style="text-align:center">E1,14,77,E1,F0,14,F0,77</td>
+<td style="text-align:center">-NONE-</td>
+<td style="text-align:center">—–</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="INWOX支持"><a href="#INWOX支持" class="headerlink" title="INWOX支持"></a>INWOX支持</h3>
       
     </div>
 
@@ -604,8 +1608,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -791,6 +1804,23 @@
       </div>
 
       
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#PS-2控制器"><span class="nav-number">1.</span> <span class="nav-text">PS/2控制器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#历史"><span class="nav-number">1.1.</span> <span class="nav-text">历史</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#USB兼容支持"><span class="nav-number">1.2.</span> <span class="nav-text">USB兼容支持</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#IO端口"><span class="nav-number">1.3.</span> <span class="nav-text">IO端口</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#数据端口"><span class="nav-number">1.3.1.</span> <span class="nav-text">数据端口</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#状态寄存器"><span class="nav-number">1.3.2.</span> <span class="nav-text">状态寄存器</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#命令寄存器"><span class="nav-number">1.3.3.</span> <span class="nav-text">命令寄存器</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PS-2控制命令"><span class="nav-number">1.4.</span> <span class="nav-text">PS/2控制命令</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#PS-2控制器配置字节"><span class="nav-number">1.4.1.</span> <span class="nav-text">PS/2控制器配置字节</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#PS-2控制器输出端口"><span class="nav-number">1.4.2.</span> <span class="nav-text">PS/2控制器输出端口</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#初始化过程"><span class="nav-number">1.5.</span> <span class="nav-text">初始化过程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#初始化USB控制器"><span class="nav-number">1.5.1.</span> <span class="nav-text">初始化USB控制器</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#检查PS-2控制器是否存在"><span class="nav-number">1.5.2.</span> <span class="nav-text">检查PS/2控制器是否存在</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#禁用设备"><span class="nav-number">1.5.3.</span> <span class="nav-text">禁用设备</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#刷新输出缓存"><span class="nav-number">1.5.4.</span> <span class="nav-text">刷新输出缓存</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#配置控制器"><span class="nav-number">1.5.5.</span> <span class="nav-text">配置控制器</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#控制器自检"><span class="nav-number">1.5.6.</span> <span class="nav-text">控制器自检</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#确定是否有两个通道"><span class="nav-number">1.5.7.</span> <span class="nav-text">确定是否有两个通道</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#接口自检"><span class="nav-number">1.5.8.</span> <span class="nav-text">接口自检</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#设备使能"><span class="nav-number">1.5.9.</span> <span class="nav-text">设备使能</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#复位设备"><span class="nav-number">1.5.10.</span> <span class="nav-text">复位设备</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#检测PS-2设备类型"><span class="nav-number">1.6.</span> <span class="nav-text">检测PS/2设备类型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PS-2键盘"><span class="nav-number">2.</span> <span class="nav-text">PS/2键盘</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#命令"><span class="nav-number">2.1.</span> <span class="nav-text">命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#特殊字节"><span class="nav-number">2.2.</span> <span class="nav-text">特殊字节</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#驱动模型"><span class="nav-number">2.3.</span> <span class="nav-text">驱动模型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#命令队列和状态机"><span class="nav-number">2.3.1.</span> <span class="nav-text">命令队列和状态机</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#扫描码集，扫描码，键码"><span class="nav-number">2.3.2.</span> <span class="nav-text">扫描码集，扫描码，键码</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#扫描码集"><span class="nav-number">2.4.</span> <span class="nav-text">扫描码集</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#扫描码集1"><span class="nav-number">2.4.1.</span> <span class="nav-text">扫描码集1</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#扫描码集2"><span class="nav-number">2.4.2.</span> <span class="nav-text">扫描码集2</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#INWOX支持"><span class="nav-number">3.</span> <span class="nav-text">INWOX支持</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
 
       
 
@@ -816,7 +1846,7 @@
       <i class="fa fa-area-chart"></i>
     </span>
     
-    <span title="站点总字数">113k</span>
+    <span title="站点总字数">122k</span>
   
 
   
@@ -825,7 +1855,7 @@
       <i class="fa fa-coffee"></i>
     </span>
     
-    <span title="站点阅读时长">4:43</span>
+    <span title="站点阅读时长">5:05</span>
   
 </div>
 
