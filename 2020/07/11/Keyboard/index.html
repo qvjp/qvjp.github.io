@@ -113,7 +113,7 @@
 <meta property="og:site_name" content="INLOW开发博客">
 <meta property="og:description" content="这篇支持下PS/2键盘输入，PS/2控制器位于主板上，通常被称为键盘控制器，硬件原理不过多关注，主要说下如何从软件角度适配一个标准键盘。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-07-26T10:19:05.612Z">
+<meta property="og:updated_time" content="2020-07-26T10:21:05.643Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Keyboard">
 <meta name="twitter:description" content="这篇支持下PS/2键盘输入，PS/2控制器位于主板上，通常被称为键盘控制器，硬件原理不过多关注，主要说下如何从软件角度适配一个标准键盘。">
@@ -401,7 +401,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-07-26 18:19:05" itemprop="dateModified" datetime="2020-07-26T18:19:05+08:00">2020-07-26</time>
+                <time title="修改时间：2020-07-26 18:21:05" itemprop="dateModified" datetime="2020-07-26T18:21:05+08:00">2020-07-26</time>
               
             
           </span>
@@ -470,7 +470,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">8.9k</span>
+                <span title="本文字数">8.5k</span>
               
 
               
@@ -484,7 +484,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">22 分钟</span>
+                <span title="阅读时长">21 分钟</span>
               
             </div>
           
@@ -639,8 +639,42 @@
 <li>等待设备回复0xFA</li>
 <li>发送“身份识别”命令0xF2给设备</li>
 <li>等待设备回复0xFA</li>
-<li>等待设备最多回复2个字节的内容，用超时来结束等待（应为有些只会回复一个字节），下边是可能回复的字节及对应的设备类型<br>  | Byte(s)                | Type                                 |<br>  | :—–:                | :–:                                 |<br>  | None                   | 转换开启的AT键盘，第二个PS/2端口不可能使用 |<br>  | 0x00                   | 标准PS/2鼠标                          |<br>  | 0x03                   | 带滚轮的鼠标                           |<br>  | 0x04                   | 5键鼠标                               |<br>  | 0xAB, 0x41或0xAB, 0xC1 | 开启转换的MF2键盘，第二个PS/2端口不可能使用|<br>  | 0xAB,0x83              | MF2键盘                              |</li>
+<li>等待设备最多回复2个字节的内容，用超时来结束等待（应为有些只会回复一个字节），下边是可能回复的字节及对应的设备类型</li>
 </ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Byte(s)</th>
+<th style="text-align:center">Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">None</td>
+<td style="text-align:center">转换开启的AT键盘，第二个PS/2端口不可能使用</td>
+</tr>
+<tr>
+<td style="text-align:center">0x00</td>
+<td style="text-align:center">标准PS/2鼠标</td>
+</tr>
+<tr>
+<td style="text-align:center">0x03</td>
+<td style="text-align:center">带滚轮的鼠标</td>
+</tr>
+<tr>
+<td style="text-align:center">0x04</td>
+<td style="text-align:center">5键鼠标</td>
+</tr>
+<tr>
+<td style="text-align:center">0xAB, 0x41或0xAB, 0xC1</td>
+<td style="text-align:center">开启转换的MF2键盘，第二个PS/2端口不可能使用</td>
+</tr>
+<tr>
+<td style="text-align:center">0xAB,0x83</td>
+<td style="text-align:center">MF2键盘</td>
+</tr>
+</tbody>
+</table>
 <p>在获取到设备类型后，别忘记取消“禁用扫描”功能。</p>
 <h3 id="PS-2键盘"><a href="#PS-2键盘" class="headerlink" title="PS/2键盘"></a>PS/2键盘</h3><p>PS/2键盘是使用串行通信与PS/2控制器通信的设备，理想情况下每种PS/2控制驱动程序都会提供标准的发送接收接口，而不用关心更底层的细节。PS/2键盘接收命令并发送命令的响应，还会发送按键或释放键的扫描码，然后PS/2控制器可能会改变（即转换）这些扫描码的信息，具体取决于控制器的设置。</p>
 <h4 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h4><p>PS/2键盘可以接收很多类型的命令，命令为1个字节，某些命令的数据字节必须在命令发送之后再发送。键盘通常会发送”ACK”或“Resend”来表明接收是否成功。下边是具体的命令信息：</p>
@@ -805,7 +839,29 @@
 <p>键码没有什么标准，这是我们需要为自己OS发明的东西，具体设计稍后再“INWOX支持”节再说。</p>
 <p>驱动本质就是将扫描码通过扫描码集规定的规则转换成键码，然后再交由其他程序处理的过程。</p>
 <h4 id="扫描码集"><a href="#扫描码集" class="headerlink" title="扫描码集"></a>扫描码集</h4><p>由于存在三种不同的扫描码集，因此需要三个表来保存这些信息。</p>
-<p>扫描码集中保存了一些随时间可能增加的键，一些已成相对标准的按键，如下：<br>|标签|含义|<br>|—–|——|<br>|keypad|数字键盘上的按键|<br>|ACPI|通常键盘顶部的一些ACPI组的功能键（这个ACPI和高级配置与电源接口毫无关系，只是普通按键）|<br>|multimedia|作为多媒体控制的键，如音量控制、暂停播放等|</p>
+<p>扫描码集中保存了一些随时间可能增加的键，一些已成相对标准的按键，如下：</p>
+<table>
+<thead>
+<tr>
+<th>标签</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>keypad</td>
+<td>数字键盘上的按键</td>
+</tr>
+<tr>
+<td>ACPI</td>
+<td>通常键盘顶部的一些ACPI组的功能键（这个ACPI和高级配置与电源接口毫无关系，只是普通按键）</td>
+</tr>
+<tr>
+<td>multimedia</td>
+<td>作为多媒体控制的键，如音量控制、暂停播放等</td>
+</tr>
+</tbody>
+</table>
 <h5 id="扫描码集1"><a href="#扫描码集1" class="headerlink" title="扫描码集1"></a>扫描码集1</h5><table>
 <thead>
 <tr>
@@ -2143,7 +2199,7 @@
       <i class="fa fa-coffee"></i>
     </span>
     
-    <span title="站点阅读时长">5:05</span>
+    <span title="站点阅读时长">5:04</span>
   
 </div>
 
