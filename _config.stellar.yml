@@ -1,0 +1,62 @@
+comments:
+  service: beaudar
+  beaudar:
+    repo: qvjp/qvjp.github.io
+    branch: beaudar
+    issue-term: pathname
+    label: comment✨💬✨
+    theme: preferred-color-scheme
+    keep-theme: false
+    crossorigin: anonymous
+
+
+######## Sidebar ########
+sidebar:
+  menu:
+    # post: '[btn.blog](/)'
+    # wiki: '[btn.wiki](/wiki/)'
+    # friends: '[友链](/friends/)'
+    # about: '[关于](/about/)'
+  # Sidebar widgets
+  widget_layout:
+    index: [welcome, recent] # for home/wiki/categories/tags/archives/404 pages
+    page: [welcome, toc] # for pages using 'layout:page'
+    post: [toc, repo_info] # for pages using 'layout:post'
+    wiki: [toc, repo_info, wiki_more] # for pages using 'layout:wiki'
+  widgets:
+    # Recent update
+    recent:
+      layout: recent
+      rss: # /atom.xml # npm i hexo-generator-feed
+      limit: 5 # Count of posts
+    # TOC (valid only in layout:post/wiki)
+    toc:
+      layout: toc
+      list_number: false
+      min_depth: 2
+      max_depth: 5
+      fallback: recent # Use a backup widget when toc does not exist.
+    # welcome
+    welcome:
+      layout: markdown
+      title: '欢迎你：'
+      content: |
+        这是又一个操作系统原理介绍、代码实现的网站，将长期维护并保持低频更新。
+
+article:
+  # 分类颜色
+  category_color:
+    '新闻稿': '#DA0F47'
+    '设计开发': '#03a9f4'
+    '奇思妙想': '#009688'
+    '解决方案': '#ff9800'
+    '技术加油站': '#4caf50'
+    '开源库': '#4caf50'
+    '博客主题': '#ffa000'
+    '应用程序': '#e91e63'
+    '实用脚本': '#009688'
+  share: [wechat, weibo, email, link]
+
+style:
+  codeblock:
+    scrollbar: 0px
